@@ -1,14 +1,19 @@
-from functools import cache
-from pydantic import BaseModel
+import asyncio
 import os
-from typing import Annotated, Any
-import httpx
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request, Depends
+from functools import cache
+from typing import Annotated, Any, TypedDict
+import logging
+
+import httpx
+from fastapi import Depends, FastAPI, Request
+from pydantic import BaseModel
 
 API_URL = "https://friendsseminary.instructure.com/api/v1"
 # TODO: Propagate Canvas API errors
 # TODO: Implement pagination helper
+
+logger = logging.getLogger(__name__)
 
 class Course(BaseModel):
     model_config = {"extra": "allow"}
@@ -16,6 +21,21 @@ class Course(BaseModel):
     id: int
     name: str
     course_code: str
+
+class PlannerNote(TypedDict):
+    id: int
+    title: str
+    description: str
+    user_id: int
+    course_id: int | None
+    todo_date: str | None # ISO8601 string
+    # does not include linked object data or workflow state
+
+# MAYBE: include IDs later
+class BulkDeleteResult(BaseModel):
+    total: int
+    deleted: int
+    failed: int
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -53,3 +73,28 @@ async def get_pdfs(client: HTTPClient, course_id: int) -> list[dict]: # TODO: St
         for item in module["items"]
         if item["type"] == "File" 
     ]
+
+async def delete_note(client: httpx.AsyncClient, note: PlannerNote) -> bool:
+    try:
+        resp = await client.delete(f"/planner_notes/{note['id']}", headers=canvas_auth())
+        resp.raise_for_status()
+        logger.info("Deleted note: %s (%s)", note["title"], note["todo_date"])
+        return True
+    except httpx.HTTPError as e:
+        logger.error("Failed to delete note: %s (%s): %s", note["title"], note["todo_date"], e)
+        return False
+
+# TODO: Add semaphore
+@app.delete("/courses/{course_id}/notes", summary="Delete all planner notes for a course") # might not be idiomatic for webapp
+async def delete_notes(client: HTTPClient, course_id: int) -> BulkDeleteResult:
+    params = {"context_codes[]": f"course_{course_id}", "per_page": 100}
+    resp = await client.get("/planner_notes", params=params, headers=canvas_auth())
+    resp.raise_for_status()
+    planner_notes: list[PlannerNote] = resp.json()
+    results = await asyncio.gather(*(delete_note(client, note) for note in planner_notes))
+
+    total = len(planner_notes)
+    deleted = sum(results)
+    return BulkDeleteResult(total=total, deleted=deleted, failed=total - deleted)
+
+# MAYBE: Add method to preview current notes pre-deletion
