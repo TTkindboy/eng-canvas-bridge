@@ -85,7 +85,7 @@ wheels = [
 ]
 
 [[package]]
-name = "eng-canvas-bridge"
+name = "eng-canvas-bridge-backend"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
