@@ -1,5 +1,5 @@
 [project]
-name = "eng-canvas-bridge"
+name = "eng-canvas-bridge-backend"
 version = "0.1.0"
 description = "Converts Friends Seminary english schedule PDFs to Canvas planner notes"
 # readme = "README.md"
