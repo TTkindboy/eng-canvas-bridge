@@ -2,7 +2,7 @@
 name = "eng-canvas-bridge"
 version = "0.1.0"
 description = "Converts Friends Seminary english schedule PDFs to Canvas planner notes"
-readme = "README.md"
+# readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "fastapi[standard-no-fastapi-cloud-cli]>=0.135.1",
