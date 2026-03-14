@@ -2,6 +2,7 @@ import useSWR from "swr"
 import { ChevronRight, GraduationCap } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
 import { fetchCourses, type CourseOption } from "@/lib/api"
+import { isEnglishCourse } from "@/lib/highlighting"
 import { cn } from "@/lib/utils"
 
 interface CourseStepProps {
@@ -11,10 +12,9 @@ interface CourseStepProps {
 export function CourseStep({ onSelect }: CourseStepProps) {
   const { data: courses, error, isLoading } = useSWR<CourseOption[]>("courses", fetchCourses)
 
-  // Sort courses: English courses first, then others
   const sortedCourses = courses?.slice().sort((a, b) => {
-    const aIsEnglish = a.name.toLowerCase().includes("english")
-    const bIsEnglish = b.name.toLowerCase().includes("english")
+    const aIsEnglish = isEnglishCourse(a.name)
+    const bIsEnglish = isEnglishCourse(b.name)
     if (aIsEnglish && !bIsEnglish) return -1
     if (!aIsEnglish && bIsEnglish) return 1
     return a.name.localeCompare(b.name)
@@ -46,7 +46,7 @@ export function CourseStep({ onSelect }: CourseStepProps) {
           <p className="text-destructive text-sm">Failed to load courses.</p>
         )}
         {sortedCourses?.map((course) => {
-          const isEnglish = course.name.toLowerCase().includes("english")
+          const isEnglish = isEnglishCourse(course.name)
           return (
             <button
               key={course.id}
