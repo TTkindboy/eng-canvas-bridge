@@ -5,6 +5,6 @@ export function isEnglishCourse(name: string) {
   return name.toLowerCase().includes("english")
 }
 
-export function hasMonthInText(text: string) {
+export function isSchedule(text: string) {
   return MONTH_IN_TEXT_PATTERN.test(text)
 }

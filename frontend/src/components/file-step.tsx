@@ -3,7 +3,7 @@ import { ArrowLeft, FileText, ChevronRight, SendHorizonal } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
 import { Button } from "@/components/ui/button"
 import { fetchCourseFiles, type FileOption } from "@/lib/api"
-import { hasMonthInText } from "@/lib/highlighting"
+import { isSchedule } from "@/lib/highlighting"
 import { cn } from "@/lib/utils"
 
 interface FileStepProps {
@@ -23,8 +23,8 @@ export function FileStep({ courseId, courseName, selectedFile, onFileSelect, onB
   )
 
   const sortedPdfs = pdfs?.slice().sort((a, b) => {
-    const aHasMonth = hasMonthInText(a.title)
-    const bHasMonth = hasMonthInText(b.title)
+    const aHasMonth = isSchedule(a.title)
+    const bHasMonth = isSchedule(b.title)
     if (aHasMonth && !bHasMonth) return -1
     if (!aHasMonth && bHasMonth) return 1
     return a.title.localeCompare(b.title)
@@ -71,7 +71,7 @@ export function FileStep({ courseId, courseName, selectedFile, onFileSelect, onB
         )}
         {sortedPdfs?.map((pdf) => {
           const isSelected = selectedFile?.id === pdf.id
-          const hasMonth = hasMonthInText(pdf.title)
+          const hasMonth = isSchedule(pdf.title)
 
           return (
             <button
