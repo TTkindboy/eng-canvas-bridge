@@ -11,6 +11,10 @@
 		"ghcr.io/va-h/devcontainers-features/uv:1": {
 			"shellautocompletion": true,
 			"version": "latest"
+		},
+		"ghcr.io/devcontainers/features/git-lfs:1": {
+			"autoPull": true,
+			"version": "latest"
 		}
 	},
 	"onCreateCommand": "uv python install 3.13 && uv tool install rust-just",
