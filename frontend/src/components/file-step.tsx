@@ -3,6 +3,7 @@ import { ArrowLeft, FileText, ChevronRight, SendHorizonal } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
 import { Button } from "@/components/ui/button"
 import { fetchCourseFiles, type FileOption } from "@/lib/api"
+import { hasMonthInText } from "@/lib/highlighting"
 import { cn } from "@/lib/utils"
 
 interface FileStepProps {
@@ -20,6 +21,14 @@ export function FileStep({ courseId, courseName, selectedFile, onFileSelect, onB
     pdfsKey,
     ([, currentCourseId]: readonly [string, string]) => fetchCourseFiles(currentCourseId)
   )
+
+  const sortedPdfs = pdfs?.slice().sort((a, b) => {
+    const aHasMonth = hasMonthInText(a.title)
+    const bHasMonth = hasMonthInText(b.title)
+    if (aHasMonth && !bHasMonth) return -1
+    if (!aHasMonth && bHasMonth) return 1
+    return a.title.localeCompare(b.title)
+  })
 
   const handleSubmit = () => {
     if (selectedFile) {
@@ -57,35 +66,50 @@ export function FileStep({ courseId, courseName, selectedFile, onFileSelect, onB
         {error && (
           <p className="text-destructive text-sm">Failed to load files.</p>
         )}
-        {!isLoading && pdfs?.length === 0 && (
+        {!isLoading && sortedPdfs?.length === 0 && (
           <p className="text-muted-foreground text-sm py-4">No files found for this course.</p>
         )}
-        {pdfs?.map((pdf) => (
-          <button
-            key={pdf.id}
-            onClick={() => onFileSelect(pdf.id, pdf.title)}
-            className={cn(
-              "group flex items-center justify-between rounded-xl border px-4 py-3",
-              "text-left text-sm font-medium transition-all duration-150",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-              selectedFile?.id === pdf.id
-                ? "border-foreground bg-foreground text-background"
-                : "border-border bg-card text-card-foreground hover:border-foreground/30 hover:bg-accent hover:shadow-sm"
-            )}
-          >
-            <div className="flex items-center gap-3 min-w-0">
-              <FileText className={cn(
+        {sortedPdfs?.map((pdf) => {
+          const isSelected = selectedFile?.id === pdf.id
+          const hasMonth = hasMonthInText(pdf.title)
+
+          return (
+            <button
+              key={pdf.id}
+              onClick={() => onFileSelect(pdf.id, pdf.title)}
+              className={cn(
+                "group flex items-center justify-between rounded-xl border px-4 py-3",
+                "text-left text-sm transition-all duration-150",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                isSelected
+                  ? "border-foreground bg-foreground text-background"
+                  : hasMonth
+                    ? "border-foreground/40 bg-foreground/5 font-bold hover:bg-foreground/10 hover:border-foreground/60 hover:shadow-md"
+                    : "border-border bg-card font-medium text-card-foreground hover:border-foreground/30 hover:bg-accent hover:shadow-sm"
+              )}
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <FileText className={cn(
+                  "size-4 shrink-0 transition-colors",
+                  isSelected
+                    ? "text-background/70"
+                    : hasMonth
+                      ? "text-foreground"
+                      : "text-muted-foreground group-hover:text-foreground"
+                )} />
+                <span className="truncate">{pdf.title}</span>
+              </div>
+              <ChevronRight className={cn(
                 "size-4 shrink-0 transition-colors",
-                selectedFile?.id === pdf.id ? "text-background/70" : "text-muted-foreground group-hover:text-foreground"
+                isSelected
+                  ? "text-background/50"
+                  : hasMonth
+                    ? "text-foreground/70"
+                    : "text-muted-foreground/50 group-hover:text-foreground"
               )} />
-              <span className="truncate">{pdf.title}</span>
-            </div>
-            <ChevronRight className={cn(
-              "size-4 shrink-0 transition-colors",
-              selectedFile?.id === pdf.id ? "text-background/50" : "text-muted-foreground/50 group-hover:text-foreground"
-            )} />
-          </button>
-        ))}
+            </button>
+          )
+        })}
       </div>
 
       {selectedFile && (
