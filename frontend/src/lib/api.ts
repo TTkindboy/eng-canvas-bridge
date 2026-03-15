@@ -7,11 +7,8 @@ interface BackendCourse {
 }
 
 interface BackendFile {
-  id: number | string
-  title?: string
-  name?: string
-  filename?: string
-  display_name?: string
+  file_id: number
+  title: string
 }
 
 export interface CourseOption {
@@ -52,13 +49,8 @@ export async function fetchCourseFiles(courseId: string): Promise<FileOption[]> 
 
   return files
     .map((file) => ({
-      id: String(file.id),
-      title:
-        file.title?.trim() ||
-        file.display_name?.trim() ||
-        file.name?.trim() ||
-        file.filename?.trim() ||
-        `File ${file.id}`,
+      id: String(file.file_id),
+      title: file.title.trim()
     }))
     .filter((file) => file.id.length > 0)
 }
