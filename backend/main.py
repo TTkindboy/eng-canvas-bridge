@@ -80,14 +80,14 @@ async def get_pdfs(client: HTTPClient, course_id: int) -> list[CourseFile]: # TO
     resp.raise_for_status()
     return [
         file
-        for _, _, file in sorted(iter_files(resp.json())) # no key now because python sorts lexicographically by default
+        for _, file in sorted(iter_files(resp.json()), key=lambda t: t[0])
     ]
 
-def iter_files(modules: list[dict[str, Any]]) -> Iterator[tuple[int, int, CourseFile]]:
+def iter_files(modules: list[dict[str, Any]]) -> Iterator[tuple[tuple[int, int], CourseFile]]:
     for module in modules:
         for item in module["items"]:
             if item["type"] == "File":
-                yield module["position"], item["position"], CourseFile.model_validate(item)
+                yield (module["position"], item["position"]), CourseFile.model_validate(item)
 
 
 async def delete_note(client: httpx.AsyncClient, note: PlannerNote) -> bool:
