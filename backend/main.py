@@ -1,13 +1,14 @@
 import asyncio
+import logging
 import os
+from collections.abc import Iterator
 from contextlib import asynccontextmanager
 from functools import cache
 from typing import Annotated, Any, TypedDict
-import logging
 
 import httpx
 from fastapi import Depends, FastAPI, Request
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 
 API_URL = "https://friendsseminary.instructure.com/api/v1"
 # TODO: Propagate Canvas API errors
@@ -16,11 +17,25 @@ API_URL = "https://friendsseminary.instructure.com/api/v1"
 logger = logging.getLogger(__name__)
 
 class Course(BaseModel):
-    model_config = {"extra": "allow"}
+    model_config = ConfigDict(extra="allow")
 
     id: int
     name: str
     course_code: str
+
+ # MAYBE: sort by date modified in future?(might add too many api calls)
+class CourseFile(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    file_id: int = Field(validation_alias="content_id")
+    item_id: int = Field(validation_alias="id") # might remove later if still not needed
+    title: str
+
+# MAYBE: include IDs later
+class BulkDeleteResult(BaseModel):
+    total: int
+    deleted: int
+    failed: int
 
 class PlannerNote(TypedDict):
     id: int
@@ -30,12 +45,6 @@ class PlannerNote(TypedDict):
     course_id: int | None
     todo_date: str | None # ISO8601 string
     # does not include linked object data or workflow state
-
-# MAYBE: include IDs later
-class BulkDeleteResult(BaseModel):
-    total: int
-    deleted: int
-    failed: int
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -64,15 +73,22 @@ async def get_courses(client: HTTPClient, inactive: bool = False) -> list[Course
 
 # Maybe add query parameter to limit to schedules
 @app.get("/courses/{course_id}/pdfs", summary="List course PDFs")
-async def get_pdfs(client: HTTPClient, course_id: int) -> list[dict]: # TODO: Strengthen include parameter 
-    params: dict[str, Any] = {"include": ["items"], "per_page": 100, "search_term": ".pdf"} # assumes filenames include .pdf, which is not always the case
-    files_resp = await client.get(f"/courses/{course_id}/modules", headers=canvas_auth(), params=params)
-    files_resp.raise_for_status()
+async def get_pdfs(client: HTTPClient, course_id: int) -> list[CourseFile]: # TODO: Strengthen include parameter 
+    # assumes filenames include .pdf, which is not always the case. Maybe use mime_class in future
+    params: dict[str, Any] = {"include": ["items"], "per_page": 100, "search_term": ".pdf"}
+    resp = await client.get(f"/courses/{course_id}/modules", headers=canvas_auth(), params=params)
+    resp.raise_for_status()
     return [
-        item for module in files_resp.json()
-        for item in module["items"]
-        if item["type"] == "File" 
+        file
+        for _, _, file in sorted(iter_files(resp.json())) # no key now because python sorts lexicographically by default
     ]
+
+def iter_files(modules: list[dict[str, Any]]) -> Iterator[tuple[int, int, CourseFile]]:
+    for module in modules:
+        for item in module["items"]:
+            if item["type"] == "File":
+                yield module["position"], item["position"], CourseFile.model_validate(item)
+
 
 async def delete_note(client: httpx.AsyncClient, note: PlannerNote) -> bool:
     try:
