@@ -12,13 +12,9 @@ interface CourseStepProps {
 export function CourseStep({ onSelect }: CourseStepProps) {
   const { data: courses, error, isLoading } = useSWR<CourseOption[]>("courses", fetchCourses)
 
-  const sortedCourses = courses?.slice().sort((a, b) => {
-    const aIsEnglish = isEnglishCourse(a.name)
-    const bIsEnglish = isEnglishCourse(b.name)
-    if (aIsEnglish && !bIsEnglish) return -1
-    if (!aIsEnglish && bIsEnglish) return 1
-    return a.name.localeCompare(b.name)
-  })
+  const sortedCourses = courses?.toSorted(
+    (a, b) => Number(isEnglishCourse(b.name)) - Number(isEnglishCourse(a.name)) // preserves backend sorting
+  )
 
   return (
     <div className="flex flex-col gap-6">
