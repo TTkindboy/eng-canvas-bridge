@@ -8,9 +8,13 @@ from typing import Annotated, Any, TypedDict
 
 import httpx
 from fastapi import Depends, FastAPI, Request
+from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel, ConfigDict, Field
 
-API_URL = "https://friendsseminary.instructure.com/api/v1"
+from .pdf_parsing import extract_lines_from_pdf
+
+SITE_URL = "https://friendsseminary.instructure.com"
+API_URL = f"{SITE_URL}/api/v1"
 # TODO: Propagate Canvas API errors
 # TODO: Implement pagination helper
 
@@ -88,6 +92,17 @@ def iter_files(modules: list[dict[str, Any]]) -> Iterator[tuple[tuple[int, int],
         for item in module["items"]:
             if item["type"] == "File":
                 yield (module["position"], item["position"]), CourseFile.model_validate(item)
+
+
+@app.get("/pdfs/{file_id}", summary="Get PDF content as text", response_class=PlainTextResponse)
+async def get_pdf_content(client: HTTPClient, file_id: int) -> str:
+    pdf_resp = await client.get(
+        f"{SITE_URL}/files/{file_id}/download", # override baseurl bc no /api/v1
+        headers=canvas_auth(),
+        follow_redirects=True,
+    )
+    pdf_resp.raise_for_status()
+    return extract_lines_from_pdf(pdf_resp.content)
 
 
 async def delete_note(client: httpx.AsyncClient, note: PlannerNote) -> bool:
