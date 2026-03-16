@@ -77,12 +77,12 @@ def iter_files(modules: list[dict[str, Any]]) -> Iterator[tuple[tuple[int, int],
 
 async def delete_note(client: httpx.AsyncClient, note: PlannerNote) -> bool:
     try:
-        resp = await client.delete(f"/planner_notes/{note['id']}", headers=canvas_auth())
+        resp = await client.delete(f"/planner_notes/{note.id}", headers=canvas_auth())
         resp.raise_for_status()
-        logger.info("Deleted note: %s (%s)", note["title"], note["todo_date"])
+        logger.info("Deleted note: %s (%s)", note.title, note.todo_date)
         return True
     except httpx.HTTPError as e:
-        logger.error("Failed to delete note: %s (%s): %s", note["title"], note["todo_date"], e)
+        logger.error("Failed to delete note: %s (%s): %s", note.title, note.todo_date, e)
         return False
 
 # TODO: Add semaphore
