@@ -44,11 +44,11 @@ def nearest_matching_date(month: int, day: int, weekday: str | int | calendar.Da
 
 
 class PlannerNote(BaseModel):
-    id: int | None = None # OR none when creating
+    id: int | None = None # ONLY POST CREATION
     title: str
-    description: str
-    user_id: int | None = None # idk what to do at this point, i am losing my mind, all are optional now
-    course_id: int | None = None
+    description: str | None = None
+    user_id: int | None = None # ONLY POST CREATION
+    course_id: int | None # you should have to explicitly set to None
     todo_date: date | None # you should have to explicitly set to None
     # does not include linked object data or workflow state
 
