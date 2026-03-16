@@ -1,20 +1,17 @@
 import asyncio
 import logging
-import os
 from collections.abc import Iterator
 from contextlib import asynccontextmanager
-from functools import cache
-from typing import Annotated, Any, TypedDict
+from typing import Any
 
 import httpx
-from fastapi import Depends, FastAPI, Request
-from fastapi.responses import PlainTextResponse
+from fastapi import FastAPI
 from pydantic import BaseModel, ConfigDict, Field
 
-from .pdf_parsing import extract_lines_from_pdf
+from . import pdf_parsing
+from .pdf_parsing import PlannerNote
+from .dependencies import HTTPClient, canvas_auth, API_URL
 
-SITE_URL = "https://friendsseminary.instructure.com"
-API_URL = f"{SITE_URL}/api/v1"
 # TODO: Propagate Canvas API errors
 # TODO: Implement pagination helper
 
@@ -41,30 +38,14 @@ class BulkDeleteResult(BaseModel):
     deleted: int
     failed: int
 
-class PlannerNote(TypedDict):
-    id: int
-    title: str
-    description: str
-    user_id: int
-    course_id: int | None
-    todo_date: str | None # ISO8601 string
-    # does not include linked object data or workflow state
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     async with httpx.AsyncClient(base_url=API_URL) as client:
         yield {"http_client": client}
 
-async def get_client(request: Request) -> httpx.AsyncClient:
-    return request.state.http_client
-
-type HTTPClient = Annotated[httpx.AsyncClient, Depends(get_client)]
-
 app = FastAPI(lifespan=lifespan)
-
-@cache
-def canvas_auth(): # temparary until OAuth2
-    return {"Authorization": f"Bearer {os.getenv('CANVAS_API_KEY')}"}
+app.include_router(pdf_parsing.router)
 
 @app.get("/courses")
 async def get_courses(client: HTTPClient, inactive: bool = False) -> list[Course]:
@@ -92,17 +73,6 @@ def iter_files(modules: list[dict[str, Any]]) -> Iterator[tuple[tuple[int, int],
         for item in module["items"]:
             if item["type"] == "File":
                 yield (module["position"], item["position"]), CourseFile.model_validate(item)
-
-
-@app.get("/pdfs/{file_id}", summary="Get PDF content as text", response_class=PlainTextResponse)
-async def get_pdf_content(client: HTTPClient, file_id: int) -> str:
-    pdf_resp = await client.get(
-        f"{SITE_URL}/files/{file_id}/download", # override baseurl bc no /api/v1
-        headers=canvas_auth(),
-        follow_redirects=True,
-    )
-    pdf_resp.raise_for_status()
-    return extract_lines_from_pdf(pdf_resp.content)
 
 
 async def delete_note(client: httpx.AsyncClient, note: PlannerNote) -> bool:
