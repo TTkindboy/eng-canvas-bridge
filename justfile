@@ -5,7 +5,7 @@ frontend_delay := '0.5'
 
 [private]
 default:  
-  just --list --unsorted
+  @just --list --unsorted
 
 [group('dev')]
 [parallel]
