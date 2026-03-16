@@ -12,8 +12,8 @@ interface CourseStepProps {
 export function CourseStep({ onSelect }: CourseStepProps) {
   const { data: courses, error, isLoading } = useSWR<CourseOption[]>("courses", fetchCourses)
 
-  const sortedCourses = courses?.toSorted(
-    (a, b) => Number(isEnglishCourse(b.name)) - Number(isEnglishCourse(a.name)) // preserves backend sorting
+  const sortedCourses = courses?.toSorted( // MAYBE: add alphabetical tiebreaker bc courses don't have backend sorting logic
+    (a, b) => Number(isEnglishCourse(b.name)) - Number(isEnglishCourse(a.name))
   )
 
   return (

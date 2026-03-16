@@ -22,13 +22,9 @@ export function FileStep({ courseId, courseName, selectedFile, onFileSelect, onB
     ([, currentCourseId]: readonly [string, string]) => fetchCourseFiles(currentCourseId)
   )
 
-  const sortedPdfs = pdfs?.slice().sort((a, b) => {
-    const aHasMonth = isSchedule(a.title)
-    const bHasMonth = isSchedule(b.title)
-    if (aHasMonth && !bHasMonth) return -1
-    if (!aHasMonth && bHasMonth) return 1
-    return a.title.localeCompare(b.title)
-  })
+  const sortedPdfs = pdfs?.toSorted(
+    (a, b) => Number(isSchedule(b.title)) - Number(isSchedule(a.title)) // preserves backend sorting
+  )
 
   const handleSubmit = () => {
     if (selectedFile) {
