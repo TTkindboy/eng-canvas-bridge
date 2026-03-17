@@ -83,7 +83,7 @@ class Eng10Schedule(BaseModel):
             pdf_text,
             re.MULTILINE | re.DOTALL
         )
-        assert len({k for k, _ in matches}) == len(matches) # check no duplcate sections
+        assert len({k for k, _ in matches}) == len(matches) # check no duplicate sections
         result: dict[str, str] = dict(matches)
         return cls._from_sections(result)
 
@@ -97,7 +97,7 @@ class Eng10Schedule(BaseModel):
     @staticmethod
     def _parse_section(section_text: str) -> list[PlannerNote]:
         matches = re.findall(
-            r"^(?P<weekday>Th|M|T|W|F)\s+(?P<month>[1-9]|1[0-2])/(?P<day>[1-9]|[12]\d|3[01])\s*[-–—]\s*(?P<assignment>.+?)\s*$", # no (?m) because mutliline defined below
+            r"^(?P<weekday>Th|M|T|W|F)\s+(?P<month>[1-9]|1[0-2])/(?P<day>[1-9]|[12]\d|3[01])\s*[-–—]\s*(?P<assignment>.+?)\s*$", # no (?m) because multiline defined below
             section_text,
             re.MULTILINE
         )

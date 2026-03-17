@@ -13,5 +13,5 @@ async def get_client(request: Request) -> httpx.AsyncClient:
 type HTTPClient = Annotated[httpx.AsyncClient, Depends(get_client)]
 
 @cache
-def canvas_auth(): # temparary until OAuth2
+def canvas_auth(): # temporary until OAuth2
     return {"Authorization": f"Bearer {os.environ['CANVAS_API_KEY']}"}
