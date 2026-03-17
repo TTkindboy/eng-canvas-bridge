@@ -25,7 +25,8 @@
 				"astral-sh.ty",
 				"charliermarsh.ruff",
 				"fastapilabs.fastapi-vscode",
-				"nefrob.vscode-just-syntax" // small chance this is incorrect/deprecated extension
+				"nefrob.vscode-just-syntax", // small chance this is incorrect/deprecated extension
+				"-ms-python.vscode-python-envs"
 			],
 			"settings": {
 				"editor.inlayHints.enabled": "offUnlessPressed",
@@ -33,7 +34,8 @@
 				"ty.diagnosticMode": "workspace",
 				"editor.codeLens": false,
 				"vscode-just.lspPath": "/usr/local/bin/just-lsp",
-				"fastapi.cloud.enabled": false
+				"fastapi.cloud.enabled": false,
+				"python.useEnvironmentsExtension": false
 			}
 		}
 	}
