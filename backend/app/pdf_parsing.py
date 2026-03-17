@@ -77,7 +77,7 @@ class Eng10Schedule(BaseModel):
     even_days: list[PlannerNote] = Field(serialization_alias="even")
 
     @classmethod
-    def from_pdf_text(cls, pdf_text: str) -> Eng10Schedule:
+    def from_pdf_text(cls, pdf_text: str, course_id: int | None = None) -> Eng10Schedule:
         matches = re.findall(
             r"^(ODD|EVEN) DAYS\s*$(.*?)(?=^(?:ODD|EVEN) DAYS\s*$|\Z)", # no (?ms) inline because defined down below
             pdf_text,
@@ -85,17 +85,17 @@ class Eng10Schedule(BaseModel):
         )
         assert len({k for k, _ in matches}) == len(matches) # check no duplicate sections
         result: dict[str, str] = dict(matches)
-        return cls._from_sections(result)
+        return cls._from_sections(result, course_id=course_id)
 
     @classmethod
-    def _from_sections(cls, pdf_text: dict[str, str]) -> Eng10Schedule:
+    def _from_sections(cls, pdf_text: dict[str, str], course_id: int | None = None) -> Eng10Schedule:
         return cls(
-            odd_days=cls._parse_section(pdf_text["ODD"]),
-            even_days=cls._parse_section(pdf_text["EVEN"])
+            odd_days=cls._parse_section(pdf_text["ODD"], course_id=course_id),
+            even_days=cls._parse_section(pdf_text["EVEN"], course_id=course_id)
         )
     
     @staticmethod
-    def _parse_section(section_text: str) -> list[PlannerNote]:
+    def _parse_section(section_text: str, course_id: int | None = None) -> list[PlannerNote]:
         matches = re.findall(
             r"^(?P<weekday>Th|M|T|W|F)\s+(?P<month>[1-9]|1[0-2])/(?P<day>[1-9]|[12]\d|3[01])\s*[-–—]\s*(?P<assignment>.+?)\s*$", # no (?m) because multiline defined below
             section_text,
@@ -103,7 +103,7 @@ class Eng10Schedule(BaseModel):
         )
         assert len(matches) == sum(1 for line in section_text.splitlines() if line.strip())
         return [
-            PlannerNote(todo_date=nearest_matching_date(int(month), int(day), weekday), title=assignment, course_id=2897) # TODO: COMPLETE Parameters
+            PlannerNote(todo_date=nearest_matching_date(int(month), int(day), weekday), title=assignment, course_id=course_id) # TODO: COMPLETE Parameters
             for weekday, month, day, assignment
             in matches
         ]
@@ -122,7 +122,15 @@ async def get_pdf_content(client: HTTPClient, file_id: int) -> Eng10Schedule:
 
 @router.post("/{file_id}", summary="Parse PDF and add to planner")
 async def parse_pdf_to_planner(client: HTTPClient, file_id: int, day: Literal["odd", "even"], course_id: int | None = None) -> list[PlannerNote]:
-    schedule = await get_pdf_content(client, file_id)
+    # DUPLICATED CODE with get_pdf_content, maybe refactor later
+    pdf_resp = await client.get(
+        f"{SITE_URL}/files/{file_id}/download", # override baseurl bc no /api/v1
+        headers=canvas_auth(),
+        follow_redirects=True,
+    )
+    pdf_resp.raise_for_status()
+
+    schedule = Eng10Schedule.from_pdf_text(extract_lines_from_pdf(pdf_resp.content), course_id=course_id)
     return await asyncio.gather(*(add_planner_note(client, note) for note in getattr(schedule, day + "_days")))
 
 
