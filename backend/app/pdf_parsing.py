@@ -1,6 +1,6 @@
 from __future__ import annotations
 import asyncio
-from typing import Literal, Annotated
+from typing import Literal, Annotated, Any
 from math import inf
 import calendar
 from datetime import date, datetime
@@ -45,9 +45,16 @@ def nearest_matching_date(month: int, day: int, weekday: str | int | calendar.Da
     assert best is not None
     return best
 
+def _parse_date(v: Any) -> date:
+    if isinstance(v, str):
+        return datetime.fromisoformat(v).date()
+    if isinstance(v, datetime):
+        return v.date()
+    return v
+
 type ParsedDate = Annotated[
     date,
-    BeforeValidator(lambda v: v.date() if isinstance(v, datetime) else v)
+    BeforeValidator(_parse_date)
 ]
 
 class PlannerNote(BaseModel):
@@ -56,7 +63,7 @@ class PlannerNote(BaseModel):
     description: str | None = None
     user_id: int | None = None # ONLY POST CREATION
     course_id: int | None = None # you should have to explicitly set to None
-    todo_date: ParsedDate | None # you should have to explicitly set to None
+    todo_date: ParsedDate | None # you should have to explicitly set to None # MAYBE: make AwareDateTime later
     # does not include linked object data or workflow state
 
 def extract_lines_from_pdf(pdf_bytes: bytes) -> str: # maybe list[str] later

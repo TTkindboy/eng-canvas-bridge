@@ -6,7 +6,7 @@ from typing import Any
 
 import httpx
 from fastapi import FastAPI
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 
 from . import pdf_parsing
 from .pdf_parsing import PlannerNote
@@ -75,6 +75,8 @@ def iter_files(modules: list[dict[str, Any]]) -> Iterator[tuple[tuple[int, int],
                 yield (module["position"], item["position"]), CourseFile.model_validate(item)
 
 
+_planner_notes_adapter = TypeAdapter(list[PlannerNote])
+
 async def delete_note(client: httpx.AsyncClient, note: PlannerNote) -> bool:
     try:
         resp = await client.delete(f"/planner_notes/{note.id}", headers=canvas_auth())
@@ -91,7 +93,8 @@ async def delete_notes(client: HTTPClient, course_id: int) -> BulkDeleteResult:
     params = {"context_codes[]": f"course_{course_id}", "per_page": 100}
     resp = await client.get("/planner_notes", params=params, headers=canvas_auth())
     resp.raise_for_status()
-    planner_notes: list[PlannerNote] = resp.json()
+    # resp.content to use rust validate_json speedup(canvas api is utf-8)
+    planner_notes: list[PlannerNote] = _planner_notes_adapter.validate_json(resp.content) 
     results = await asyncio.gather(*(delete_note(client, note) for note in planner_notes))
 
     total = len(planner_notes)
