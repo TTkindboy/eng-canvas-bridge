@@ -42,7 +42,7 @@ def nearest_matching_date(month: int, day: int, weekday: str | int | calendar.Da
         if distance < best_distance:
             best = d
             best_distance = distance
-    assert best is not None
+    assert best is not None # TODO: migrate from assert
     return best
 
 def _parse_date(v: Any) -> date:
@@ -68,7 +68,7 @@ class PlannerNote(BaseModel):
 
 def extract_lines_from_pdf(pdf_bytes: bytes) -> str: # maybe list[str] later
     doc = pymupdf.Document(stream=pdf_bytes)
-    assert doc.page_count == 1
+    assert doc.page_count == 1 # TODO: migrate from assert
     return doc.get_page_text(0)
 
 # MAYBE: abc later
@@ -83,7 +83,7 @@ class Eng10Schedule(BaseModel):
             pdf_text,
             re.MULTILINE | re.DOTALL
         )
-        assert len({k for k, _ in matches}) == len(matches) # check no duplicate sections
+        assert len({k for k, _ in matches}) == len(matches) # check no duplicate sections # TODO: migrate from assert
         result: dict[str, str] = dict(matches)
         return cls._from_sections(result, course_id=course_id)
 
@@ -101,7 +101,7 @@ class Eng10Schedule(BaseModel):
             section_text,
             re.MULTILINE
         )
-        assert len(matches) == sum(1 for line in section_text.splitlines() if line.strip())
+        assert len(matches) == sum(1 for line in section_text.splitlines() if line.strip()) # TODO: migrate from assert
         return [
             PlannerNote(todo_date=nearest_matching_date(int(month), int(day), weekday), title=assignment, course_id=course_id) # TODO: COMPLETE Parameters
             for weekday, month, day, assignment
