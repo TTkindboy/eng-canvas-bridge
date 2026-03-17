@@ -16,15 +16,25 @@
 			"autoPull": true,
 			"version": "latest"
 		}
-	},
-	"onCreateCommand": "uv python install 3.13 && uv tool install rust-just",
+	}, 
+	"onCreateCommand": "uv python install 3.13 && uv tool install rust-just && curl -fsSL https://github.com/terror/just-lsp/releases/download/0.4.0/just-lsp-0.4.0-x86_64-unknown-linux-gnu.tar.gz | tar xz && sudo install just-lsp /usr/local/bin/",
 	"customizations": {
 		"vscode": {
 			"extensions": [
 				"tamasfe.even-better-toml",
 				"astral-sh.ty",
-				"charliermarsh.ruff"
-			]
+				"charliermarsh.ruff",
+				"fastapilabs.fastapi-vscode",
+				"nefrob.vscode-just-syntax" // small chance this is incorrect/deprecated extension
+			],
+			"settings": {
+				"editor.inlayHints.enabled": "offUnlessPressed",
+				"files.autoSave": "off",
+				"ty.diagnosticMode": "workspace",
+				"editor.codeLens": false,
+				"vscode-just.lspPath": "/usr/local/bin/just-lsp",
+				"fastapi.cloud.enabled": false
+			}
 		}
 	}
 
