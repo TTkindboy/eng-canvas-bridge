@@ -1,16 +1,17 @@
 import asyncio
 import logging
-import os
 from collections.abc import Iterator
 from contextlib import asynccontextmanager
-from functools import cache
-from typing import Annotated, Any, TypedDict
+from typing import Any
 
 import httpx
-from fastapi import Depends, FastAPI, Request
-from pydantic import BaseModel, ConfigDict, Field
+from fastapi import FastAPI
+from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 
-API_URL = "https://friendsseminary.instructure.com/api/v1"
+from . import pdf_parsing
+from .pdf_parsing import PlannerNote
+from .dependencies import HTTPClient, canvas_auth, API_URL
+
 # TODO: Propagate Canvas API errors
 # TODO: Implement pagination helper
 
@@ -37,30 +38,14 @@ class BulkDeleteResult(BaseModel):
     deleted: int
     failed: int
 
-class PlannerNote(TypedDict):
-    id: int
-    title: str
-    description: str
-    user_id: int
-    course_id: int | None
-    todo_date: str | None # ISO8601 string
-    # does not include linked object data or workflow state
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     async with httpx.AsyncClient(base_url=API_URL) as client:
         yield {"http_client": client}
 
-async def get_client(request: Request) -> httpx.AsyncClient:
-    return request.state.http_client
-
-type HTTPClient = Annotated[httpx.AsyncClient, Depends(get_client)]
-
 app = FastAPI(lifespan=lifespan)
-
-@cache
-def canvas_auth(): # temparary until OAuth2
-    return {"Authorization": f"Bearer {os.getenv('CANVAS_API_KEY')}"}
+app.include_router(pdf_parsing.router)
 
 @app.get("/courses")
 async def get_courses(client: HTTPClient, inactive: bool = False) -> list[Course]:
@@ -90,14 +75,16 @@ def iter_files(modules: list[dict[str, Any]]) -> Iterator[tuple[tuple[int, int],
                 yield (module["position"], item["position"]), CourseFile.model_validate(item)
 
 
+_planner_notes_adapter = TypeAdapter(list[PlannerNote])
+
 async def delete_note(client: httpx.AsyncClient, note: PlannerNote) -> bool:
     try:
-        resp = await client.delete(f"/planner_notes/{note['id']}", headers=canvas_auth())
+        resp = await client.delete(f"/planner_notes/{note.id}", headers=canvas_auth())
         resp.raise_for_status()
-        logger.info("Deleted note: %s (%s)", note["title"], note["todo_date"])
+        logger.info("Deleted note: %s (%s)", note.title, note.todo_date)
         return True
     except httpx.HTTPError as e:
-        logger.error("Failed to delete note: %s (%s): %s", note["title"], note["todo_date"], e)
+        logger.error("Failed to delete note: %s (%s): %s", note.title, note.todo_date, e)
         return False
 
 # TODO: Add semaphore
@@ -106,7 +93,8 @@ async def delete_notes(client: HTTPClient, course_id: int) -> BulkDeleteResult:
     params = {"context_codes[]": f"course_{course_id}", "per_page": 100}
     resp = await client.get("/planner_notes", params=params, headers=canvas_auth())
     resp.raise_for_status()
-    planner_notes: list[PlannerNote] = resp.json()
+    # resp.content to use rust validate_json speedup(canvas api is utf-8)
+    planner_notes: list[PlannerNote] = _planner_notes_adapter.validate_json(resp.content) 
     results = await asyncio.gather(*(delete_note(client, note) for note in planner_notes))
 
     total = len(planner_notes)
