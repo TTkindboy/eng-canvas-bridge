@@ -29,7 +29,7 @@ files = '^backend'
 repo = "local"
 
 [[repos.hooks]]
-id = "generate-api-client"
+id = "generate-api-client" # maybe migrate to toml 1.1 in the future
 name = "Generate API client"
 language = "system"
 entry = "just generate"
