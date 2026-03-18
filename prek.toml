@@ -24,3 +24,14 @@ args = [
   "--config", "backend/pyproject.toml"
 ]
 files = '^backend'
+
+[[repos]]
+repo = "local"
+
+[[repos.hooks]]
+id = "generate-api-client"
+name = "Generate API client"
+language = "system"
+entry = "just generate"
+pass_filenames = false
+files = '^backend/app/'
