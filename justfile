@@ -42,9 +42,16 @@ frontend-install:
 alias gen := generate
 
 [group('generate')]
-generate: export-openapi
+generate: export-openapi generate-client
 
 [group('generate')]
 [working-directory: 'backend']
 export-openapi:
   uv run -m scripts.export_openapi
+
+alias gen-api := generate-client
+
+[group('generate')]
+[working-directory: 'frontend']
+generate-client:
+  pnpm run openapi-ts
