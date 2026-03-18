@@ -17,7 +17,7 @@
 			"version": "latest"
 		}
 	},
-	"onCreateCommand": "uv python install 3.13 && uv tool install rust-just && curl -fsSL https://github.com/terror/just-lsp/releases/download/0.4.0/just-lsp-0.4.0-x86_64-unknown-linux-gnu.tar.gz | tar xz && sudo install just-lsp /usr/local/bin/",
+	"onCreateCommand": "uv python install 3.13 && uv tool install rust-just && uv tool install prek && curl -fsSL https://github.com/terror/just-lsp/releases/download/0.4.0/just-lsp-0.4.0-x86_64-unknown-linux-gnu.tar.gz | tar xz && sudo install just-lsp /usr/local/bin/",
 	"customizations": {
 		"vscode": {
 			"extensions": [
