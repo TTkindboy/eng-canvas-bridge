@@ -46,7 +46,7 @@ async def lifespan(app: FastAPI):
         yield {"http_client": client}
 
 def custom_generate_unique_id(route: APIRoute):
-    return route.name # just temparary and naive before I add tags
+    return route.name # TODO: Add tags to id-gen after I implement them
 
 app = FastAPI(lifespan=lifespan, generate_unique_id_function=custom_generate_unique_id)
 app.include_router(pdf_parsing.router)
