@@ -4,7 +4,7 @@ set dotenv-required
 frontend_delay := '0.5'
 
 [private]
-default:  
+default:
   @just --list --unsorted
 
 [group('dev')]
@@ -28,7 +28,7 @@ _frontend-delayed: && frontend
 [group('install')]
 [parallel]
 install: backend-install frontend-install
- 
+
 [group('install')]
 [working-directory: 'backend']
 backend-install:
