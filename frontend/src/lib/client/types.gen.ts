@@ -141,7 +141,7 @@ export type ValidationError = {
     };
 };
 
-export type GetPdfContentPdfsFileIdGetData = {
+export type GetPdfContentData = {
     body?: never;
     path: {
         /**
@@ -153,25 +153,25 @@ export type GetPdfContentPdfsFileIdGetData = {
     url: '/pdfs/{file_id}';
 };
 
-export type GetPdfContentPdfsFileIdGetErrors = {
+export type GetPdfContentErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type GetPdfContentPdfsFileIdGetError = GetPdfContentPdfsFileIdGetErrors[keyof GetPdfContentPdfsFileIdGetErrors];
+export type GetPdfContentError = GetPdfContentErrors[keyof GetPdfContentErrors];
 
-export type GetPdfContentPdfsFileIdGetResponses = {
+export type GetPdfContentResponses = {
     /**
      * Successful Response
      */
     200: Eng10Schedule;
 };
 
-export type GetPdfContentPdfsFileIdGetResponse = GetPdfContentPdfsFileIdGetResponses[keyof GetPdfContentPdfsFileIdGetResponses];
+export type GetPdfContentResponse = GetPdfContentResponses[keyof GetPdfContentResponses];
 
-export type ParsePdfToPlannerPdfsFileIdPostData = {
+export type ParsePdfToPlannerData = {
     body?: never;
     path: {
         /**
@@ -192,27 +192,27 @@ export type ParsePdfToPlannerPdfsFileIdPostData = {
     url: '/pdfs/{file_id}';
 };
 
-export type ParsePdfToPlannerPdfsFileIdPostErrors = {
+export type ParsePdfToPlannerErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type ParsePdfToPlannerPdfsFileIdPostError = ParsePdfToPlannerPdfsFileIdPostErrors[keyof ParsePdfToPlannerPdfsFileIdPostErrors];
+export type ParsePdfToPlannerError = ParsePdfToPlannerErrors[keyof ParsePdfToPlannerErrors];
 
-export type ParsePdfToPlannerPdfsFileIdPostResponses = {
+export type ParsePdfToPlannerResponses = {
     /**
-     * Response Parse Pdf To Planner Pdfs  File Id  Post
+     * Response Parse Pdf To Planner
      *
      * Successful Response
      */
     200: Array<PlannerNote>;
 };
 
-export type ParsePdfToPlannerPdfsFileIdPostResponse = ParsePdfToPlannerPdfsFileIdPostResponses[keyof ParsePdfToPlannerPdfsFileIdPostResponses];
+export type ParsePdfToPlannerResponse = ParsePdfToPlannerResponses[keyof ParsePdfToPlannerResponses];
 
-export type GetCoursesCoursesGetData = {
+export type GetCoursesData = {
     body?: never;
     path?: never;
     query?: {
@@ -224,27 +224,27 @@ export type GetCoursesCoursesGetData = {
     url: '/courses';
 };
 
-export type GetCoursesCoursesGetErrors = {
+export type GetCoursesErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type GetCoursesCoursesGetError = GetCoursesCoursesGetErrors[keyof GetCoursesCoursesGetErrors];
+export type GetCoursesError = GetCoursesErrors[keyof GetCoursesErrors];
 
-export type GetCoursesCoursesGetResponses = {
+export type GetCoursesResponses = {
     /**
-     * Response Get Courses Courses Get
+     * Response Get Courses
      *
      * Successful Response
      */
     200: Array<Course>;
 };
 
-export type GetCoursesCoursesGetResponse = GetCoursesCoursesGetResponses[keyof GetCoursesCoursesGetResponses];
+export type GetCoursesResponse = GetCoursesResponses[keyof GetCoursesResponses];
 
-export type GetPdfsCoursesCourseIdPdfsGetData = {
+export type GetPdfsData = {
     body?: never;
     path: {
         /**
@@ -256,27 +256,27 @@ export type GetPdfsCoursesCourseIdPdfsGetData = {
     url: '/courses/{course_id}/pdfs';
 };
 
-export type GetPdfsCoursesCourseIdPdfsGetErrors = {
+export type GetPdfsErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type GetPdfsCoursesCourseIdPdfsGetError = GetPdfsCoursesCourseIdPdfsGetErrors[keyof GetPdfsCoursesCourseIdPdfsGetErrors];
+export type GetPdfsError = GetPdfsErrors[keyof GetPdfsErrors];
 
-export type GetPdfsCoursesCourseIdPdfsGetResponses = {
+export type GetPdfsResponses = {
     /**
-     * Response Get Pdfs Courses  Course Id  Pdfs Get
+     * Response Get Pdfs
      *
      * Successful Response
      */
     200: Array<CourseFile>;
 };
 
-export type GetPdfsCoursesCourseIdPdfsGetResponse = GetPdfsCoursesCourseIdPdfsGetResponses[keyof GetPdfsCoursesCourseIdPdfsGetResponses];
+export type GetPdfsResponse = GetPdfsResponses[keyof GetPdfsResponses];
 
-export type DeleteNotesCoursesCourseIdNotesDeleteData = {
+export type DeleteNotesData = {
     body?: never;
     path: {
         /**
@@ -288,20 +288,20 @@ export type DeleteNotesCoursesCourseIdNotesDeleteData = {
     url: '/courses/{course_id}/notes';
 };
 
-export type DeleteNotesCoursesCourseIdNotesDeleteErrors = {
+export type DeleteNotesErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type DeleteNotesCoursesCourseIdNotesDeleteError = DeleteNotesCoursesCourseIdNotesDeleteErrors[keyof DeleteNotesCoursesCourseIdNotesDeleteErrors];
+export type DeleteNotesError = DeleteNotesErrors[keyof DeleteNotesErrors];
 
-export type DeleteNotesCoursesCourseIdNotesDeleteResponses = {
+export type DeleteNotesResponses = {
     /**
      * Successful Response
      */
     200: BulkDeleteResult;
 };
 
-export type DeleteNotesCoursesCourseIdNotesDeleteResponse = DeleteNotesCoursesCourseIdNotesDeleteResponses[keyof DeleteNotesCoursesCourseIdNotesDeleteResponses];
+export type DeleteNotesResponse = DeleteNotesResponses[keyof DeleteNotesResponses];

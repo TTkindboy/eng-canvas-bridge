@@ -6,11 +6,12 @@ from typing import Any
 
 import httpx
 from fastapi import FastAPI
+from fastapi.routing import APIRoute
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 
 from . import pdf_parsing
+from .dependencies import API_URL, HTTPClient, canvas_auth
 from .pdf_parsing import PlannerNote
-from .dependencies import HTTPClient, canvas_auth, API_URL
 
 # TODO: Propagate Canvas API errors
 # TODO: Implement pagination helper
@@ -44,7 +45,10 @@ async def lifespan(app: FastAPI):
     async with httpx.AsyncClient(base_url=API_URL) as client:
         yield {"http_client": client}
 
-app = FastAPI(lifespan=lifespan)
+def custom_generate_unique_id(route: APIRoute):
+    return route.name # just temparary and naive before I add tags
+
+app = FastAPI(lifespan=lifespan, generate_unique_id_function=custom_generate_unique_id)
 app.include_router(pdf_parsing.router)
 
 @app.get("/courses")

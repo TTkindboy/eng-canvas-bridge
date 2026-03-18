@@ -8,7 +8,7 @@
     "/pdfs/{file_id}": {
       "get": {
         "summary": "Get PDF content",
-        "operationId": "get_pdf_content_pdfs__file_id__get",
+        "operationId": "get_pdf_content",
         "parameters": [
           {
             "name": "file_id",
@@ -45,7 +45,7 @@
       },
       "post": {
         "summary": "Parse PDF and add to planner",
-        "operationId": "parse_pdf_to_planner_pdfs__file_id__post",
+        "operationId": "parse_pdf_to_planner",
         "parameters": [
           {
             "name": "file_id",
@@ -96,7 +96,7 @@
                   "items": {
                     "$ref": "#/components/schemas/PlannerNote"
                   },
-                  "title": "Response Parse Pdf To Planner Pdfs  File Id  Post"
+                  "title": "Response Parse Pdf To Planner"
                 }
               }
             }
@@ -117,7 +117,7 @@
     "/courses": {
       "get": {
         "summary": "Get Courses",
-        "operationId": "get_courses_courses_get",
+        "operationId": "get_courses",
         "parameters": [
           {
             "name": "inactive",
@@ -140,7 +140,7 @@
                   "items": {
                     "$ref": "#/components/schemas/Course"
                   },
-                  "title": "Response Get Courses Courses Get"
+                  "title": "Response Get Courses"
                 }
               }
             }
@@ -161,7 +161,7 @@
     "/courses/{course_id}/pdfs": {
       "get": {
         "summary": "List course PDFs",
-        "operationId": "get_pdfs_courses__course_id__pdfs_get",
+        "operationId": "get_pdfs",
         "parameters": [
           {
             "name": "course_id",
@@ -183,7 +183,7 @@
                   "items": {
                     "$ref": "#/components/schemas/CourseFile"
                   },
-                  "title": "Response Get Pdfs Courses  Course Id  Pdfs Get"
+                  "title": "Response Get Pdfs"
                 }
               }
             }
@@ -204,7 +204,7 @@
     "/courses/{course_id}/notes": {
       "delete": {
         "summary": "Delete all planner notes for a course",
-        "operationId": "delete_notes_courses__course_id__notes_delete",
+        "operationId": "delete_notes",
         "parameters": [
           {
             "name": "course_id",

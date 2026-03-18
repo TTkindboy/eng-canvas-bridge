@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { DeleteNotesCoursesCourseIdNotesDeleteData, DeleteNotesCoursesCourseIdNotesDeleteErrors, DeleteNotesCoursesCourseIdNotesDeleteResponses, GetCoursesCoursesGetData, GetCoursesCoursesGetErrors, GetCoursesCoursesGetResponses, GetPdfContentPdfsFileIdGetData, GetPdfContentPdfsFileIdGetErrors, GetPdfContentPdfsFileIdGetResponses, GetPdfsCoursesCourseIdPdfsGetData, GetPdfsCoursesCourseIdPdfsGetErrors, GetPdfsCoursesCourseIdPdfsGetResponses, ParsePdfToPlannerPdfsFileIdPostData, ParsePdfToPlannerPdfsFileIdPostErrors, ParsePdfToPlannerPdfsFileIdPostResponses } from './types.gen';
+import type { DeleteNotesData, DeleteNotesErrors, DeleteNotesResponses, GetCoursesData, GetCoursesErrors, GetCoursesResponses, GetPdfContentData, GetPdfContentErrors, GetPdfContentResponses, GetPdfsData, GetPdfsErrors, GetPdfsResponses, ParsePdfToPlannerData, ParsePdfToPlannerErrors, ParsePdfToPlannerResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -21,24 +21,24 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 /**
  * Get PDF content
  */
-export const getPdfContentPdfsFileIdGet = <ThrowOnError extends boolean = false>(options: Options<GetPdfContentPdfsFileIdGetData, ThrowOnError>) => (options.client ?? client).get<GetPdfContentPdfsFileIdGetResponses, GetPdfContentPdfsFileIdGetErrors, ThrowOnError>({ url: '/pdfs/{file_id}', ...options });
+export const getPdfContent = <ThrowOnError extends boolean = false>(options: Options<GetPdfContentData, ThrowOnError>) => (options.client ?? client).get<GetPdfContentResponses, GetPdfContentErrors, ThrowOnError>({ url: '/pdfs/{file_id}', ...options });
 
 /**
  * Parse PDF and add to planner
  */
-export const parsePdfToPlannerPdfsFileIdPost = <ThrowOnError extends boolean = false>(options: Options<ParsePdfToPlannerPdfsFileIdPostData, ThrowOnError>) => (options.client ?? client).post<ParsePdfToPlannerPdfsFileIdPostResponses, ParsePdfToPlannerPdfsFileIdPostErrors, ThrowOnError>({ url: '/pdfs/{file_id}', ...options });
+export const parsePdfToPlanner = <ThrowOnError extends boolean = false>(options: Options<ParsePdfToPlannerData, ThrowOnError>) => (options.client ?? client).post<ParsePdfToPlannerResponses, ParsePdfToPlannerErrors, ThrowOnError>({ url: '/pdfs/{file_id}', ...options });
 
 /**
  * Get Courses
  */
-export const getCoursesCoursesGet = <ThrowOnError extends boolean = false>(options?: Options<GetCoursesCoursesGetData, ThrowOnError>) => (options?.client ?? client).get<GetCoursesCoursesGetResponses, GetCoursesCoursesGetErrors, ThrowOnError>({ url: '/courses', ...options });
+export const getCourses = <ThrowOnError extends boolean = false>(options?: Options<GetCoursesData, ThrowOnError>) => (options?.client ?? client).get<GetCoursesResponses, GetCoursesErrors, ThrowOnError>({ url: '/courses', ...options });
 
 /**
  * List course PDFs
  */
-export const getPdfsCoursesCourseIdPdfsGet = <ThrowOnError extends boolean = false>(options: Options<GetPdfsCoursesCourseIdPdfsGetData, ThrowOnError>) => (options.client ?? client).get<GetPdfsCoursesCourseIdPdfsGetResponses, GetPdfsCoursesCourseIdPdfsGetErrors, ThrowOnError>({ url: '/courses/{course_id}/pdfs', ...options });
+export const getPdfs = <ThrowOnError extends boolean = false>(options: Options<GetPdfsData, ThrowOnError>) => (options.client ?? client).get<GetPdfsResponses, GetPdfsErrors, ThrowOnError>({ url: '/courses/{course_id}/pdfs', ...options });
 
 /**
  * Delete all planner notes for a course
  */
-export const deleteNotesCoursesCourseIdNotesDelete = <ThrowOnError extends boolean = false>(options: Options<DeleteNotesCoursesCourseIdNotesDeleteData, ThrowOnError>) => (options.client ?? client).delete<DeleteNotesCoursesCourseIdNotesDeleteResponses, DeleteNotesCoursesCourseIdNotesDeleteErrors, ThrowOnError>({ url: '/courses/{course_id}/notes', ...options });
+export const deleteNotes = <ThrowOnError extends boolean = false>(options: Options<DeleteNotesData, ThrowOnError>) => (options.client ?? client).delete<DeleteNotesResponses, DeleteNotesErrors, ThrowOnError>({ url: '/courses/{course_id}/notes', ...options });
