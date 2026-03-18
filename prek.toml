@@ -8,6 +8,11 @@ hooks = [
 [[repos]]
 repo = "https://github.com/astral-sh/ruff-pre-commit"
 rev = "v0.15.6"
-hooks = [
-  { id = "ruff-check", args = ["--fix"] },
+
+[[repos.hooks]]
+id = "ruff-check"
+args = [
+  # "--fix", "--show-fixes",
+  "--config", "backend/pyproject.toml"
 ]
+files = '^backend'
