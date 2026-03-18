@@ -38,3 +38,13 @@ backend-install:
 [working-directory: 'frontend']
 frontend-install:
   pnpm install
+
+alias gen := generate
+
+[group('generate')]
+generate: export-openapi
+
+[group('generate')]
+[working-directory: 'backend']
+export-openapi:
+  uv run -m scripts.export_openapi

@@ -13,3 +13,6 @@ dependencies = [
 
 [tool.fastapi]
 entrypoint = "app.main:app"
+
+# [project.scripts]
+# export-openapi = "scripts.export_openapi:main" # disabled because we would need to implement build system
