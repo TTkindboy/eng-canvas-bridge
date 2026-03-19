@@ -1,5 +1,4 @@
 set dotenv-load
-set dotenv-required
 
 frontend_delay := '0.5'
 
