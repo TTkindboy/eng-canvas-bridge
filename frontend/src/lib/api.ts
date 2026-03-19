@@ -1,6 +1,6 @@
 import { client } from '@/lib/client/client.gen'
-import { getCourses, getPdfs } from '@/lib/client'
-import type { Course, CourseFile } from '@/lib/client'
+import { getCourses, getPdfs, getPdfContent, parsePdfToPlanner } from '@/lib/client'
+import type { Course, CourseFile, Eng10Schedule, PlannerNote } from '@/lib/client'
 
 client.setConfig({
   baseUrl: (import.meta.env.VITE_API_BASE_URL ?? '/api').replace(/\/$/, ''),
@@ -39,4 +39,25 @@ export async function fetchCourseFiles(courseId: string): Promise<FileOption[]> 
       title: file.title.trim(),
     }))
     .filter((file) => file.id.length > 0)
+}
+
+export async function fetchSchedulePreview(fileId: string): Promise<Eng10Schedule> {
+  const { data } = await getPdfContent({
+    path: { file_id: Number(fileId) },
+    throwOnError: true,
+  })
+  return data
+}
+
+export async function addToPlannerNotes(
+  fileId: string,
+  day: 'odd' | 'even',
+  courseId?: number,
+): Promise<PlannerNote[]> {
+  const { data } = await parsePdfToPlanner({
+    path: { file_id: Number(fileId) },
+    query: { day, course_id: courseId ?? null },
+    throwOnError: true,
+  })
+  return data
 }
