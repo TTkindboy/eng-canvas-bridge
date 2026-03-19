@@ -23,7 +23,7 @@ dev = [
 cache-dir = "~/.cache/ruff"
 
 [tool.ruff.lint]
-extend-select = ["FAST"]
+extend-select = ["FAST", "UP"]
 
 # [project.scripts]
 # export-openapi = "scripts.export_openapi:main" # disabled because we would need to implement build system
