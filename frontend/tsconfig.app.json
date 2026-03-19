@@ -28,16 +28,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": [
-    "src/App.tsx",
-    "src/main.tsx",
-    "src/index.css",
-    "src/lib/**/*.ts",
-    "src/components/course-step.tsx",
-    "src/components/file-step.tsx",
-    "src/components/ui/button.tsx",
-    "src/components/ui/select.tsx",
-    "src/components/ui/spinner.tsx",
-    "src/components/schedule-preview-step.tsx"
-  ]
+  "include": ["src"]
 }
