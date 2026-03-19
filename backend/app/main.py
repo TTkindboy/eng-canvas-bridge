@@ -62,7 +62,7 @@ async def get_courses(client: HTTPClient, inactive: bool = False) -> list[Course
 
 # Maybe add query parameter to limit to schedules
 @app.get("/courses/{course_id}/pdfs", summary="List course PDFs")
-async def get_pdfs(client: HTTPClient, course_id: int) -> list[CourseFile]: # TODO: Strengthen include parameter 
+async def get_pdfs(client: HTTPClient, course_id: int) -> list[CourseFile]: # TODO: Strengthen include parameter
     # assumes filenames include .pdf, which is not always the case. Maybe use mime_class in future
     params: dict[str, Any] = {"include": ["items"], "per_page": 100, "search_term": ".pdf"}
     resp = await client.get(f"/courses/{course_id}/modules", headers=canvas_auth(), params=params)
@@ -98,7 +98,7 @@ async def delete_notes(client: HTTPClient, course_id: int) -> BulkDeleteResult:
     resp = await client.get("/planner_notes", params=params, headers=canvas_auth())
     resp.raise_for_status()
     # resp.content to use rust validate_json speedup(canvas api is utf-8)
-    planner_notes: list[PlannerNote] = _planner_notes_adapter.validate_json(resp.content) 
+    planner_notes: list[PlannerNote] = _planner_notes_adapter.validate_json(resp.content)
     results = await asyncio.gather(*(delete_note(client, note) for note in planner_notes))
 
     total = len(planner_notes)

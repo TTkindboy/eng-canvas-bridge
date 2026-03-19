@@ -14,5 +14,13 @@ dependencies = [
 [tool.fastapi]
 entrypoint = "app.main:app"
 
+[dependency-groups]
+dev = [
+    "ruff>=0.15.6",
+]
+
+[tool.ruff]
+cache-dir = "~/.cache/ruff"
+
 # [project.scripts]
 # export-openapi = "scripts.export_openapi:main" # disabled because we would need to implement build system

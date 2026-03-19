@@ -1,0 +1,37 @@
+[[repos]]
+repo = "builtin"
+hooks = [
+  { id = "end-of-file-fixer" },
+  { id = "trailing-whitespace" },
+]
+
+[[repos]]
+repo = "https://github.com/crate-ci/typos"
+rev = "v1.44.0"
+hooks = [
+  { id = "typos" },
+]
+
+
+[[repos]]
+repo = "https://github.com/astral-sh/ruff-pre-commit"
+rev = "v0.15.6"
+
+[[repos.hooks]]
+id = "ruff-check"
+args = [
+  # "--fix", "--show-fixes",
+  "--config", "backend/pyproject.toml"
+]
+files = '^backend'
+
+[[repos]]
+repo = "local"
+
+[[repos.hooks]]
+id = "generate-api-client" # maybe migrate to toml 1.1 in the future
+name = "Generate API client"
+language = "system"
+entry = "just generate"
+pass_filenames = false
+files = '^backend/app/'

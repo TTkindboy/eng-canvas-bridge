@@ -93,7 +93,7 @@ class Eng10Schedule(BaseModel):
             odd_days=cls._parse_section(pdf_text["ODD"], course_id=course_id),
             even_days=cls._parse_section(pdf_text["EVEN"], course_id=course_id)
         )
-    
+
     @staticmethod
     def _parse_section(section_text: str, course_id: int | None = None) -> list[PlannerNote]:
         matches = re.findall(
@@ -107,8 +107,8 @@ class Eng10Schedule(BaseModel):
             for weekday, month, day, assignment
             in matches
         ]
-            
-            
+
+
 
 @router.get("/{file_id}", summary="Get PDF content", response_model_exclude_none=True)
 async def get_pdf_content(client: HTTPClient, file_id: int) -> Eng10Schedule:
@@ -138,7 +138,7 @@ async def add_planner_note(client: HTTPClient, note: PlannerNote) -> PlannerNote
     resp = await client.post(
         "/planner_notes",
         headers=canvas_auth(),
-        json=note.model_dump(mode="json", exclude={"id", "user_id"}, exclude_none=True) # Look at when have more time 
+        json=note.model_dump(mode="json", exclude={"id", "user_id"}, exclude_none=True) # Look at when have more time
     )
     resp.raise_for_status()
     return PlannerNote.model_validate(resp.json())

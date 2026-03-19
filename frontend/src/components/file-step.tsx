@@ -1,5 +1,5 @@
 import useSWR from "swr"
-import { ArrowLeft, FileText, ChevronRight, SendHorizonal } from "lucide-react"
+import { ArrowLeft, FileText, ChevronRight, SendHorizontal } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
 import { Button } from "@/components/ui/button"
 import { fetchCourseFiles, type FileOption } from "@/lib/api"
@@ -110,7 +110,7 @@ export function FileStep({ courseId, courseName, selectedFile, onFileSelect, onB
 
       {selectedFile && (
         <Button onClick={handleSubmit} className="w-full gap-2">
-          <SendHorizonal className="size-4" />
+          <SendHorizontal className="size-4" />
           Send file ID
         </Button>
       )}
