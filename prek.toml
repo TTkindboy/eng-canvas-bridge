@@ -32,7 +32,7 @@ rev = "0.10.12"
 [[repos.hooks]]
 id = "uv-lock"
 args = ["--directory", "backend"]
-files = '^(uv\.lock|pyproject\.toml|uv\.toml)$'
+files = '^backend/(uv\.lock|pyproject\.toml|uv\.toml)$'
 
 
 [[repos]]
