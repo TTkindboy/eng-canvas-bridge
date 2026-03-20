@@ -16,7 +16,7 @@ from .pdf_parsing import PlannerNote
 # TODO: Propagate Canvas API errors
 # TODO: Implement pagination helper
 
-logger: str = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 class Course(BaseModel):
     model_config = ConfigDict(extra="allow")
