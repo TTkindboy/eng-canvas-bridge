@@ -28,10 +28,10 @@ jobs:
         run: uv sync --locked --all-extras --dev
 
       - name: Lint with ruff
-        run: uv run ruff check # maybe use: astral-sh/ruff-action in the future
+        run: uv run ruff check --output-format github # maybe use: astral-sh/ruff-action in the future
 
       - name: Type check with ty
-        run: uv run ty check
+        run: uv run ty check --output-format github
 
       # - name: Run tests
       #   run: uv run pytest
