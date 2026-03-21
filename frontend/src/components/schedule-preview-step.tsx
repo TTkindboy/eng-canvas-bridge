@@ -16,9 +16,10 @@ interface SchedulePreviewStepProps {
 }
 
 function DateChip({ dateStr }: { dateStr: string }) {
-  const d = new Date(dateStr)
-  const month = d.toLocaleDateString(undefined, { month: "short" })
-  const day = d.getDate()
+  const [y, m, d] = dateStr.split("-").map(Number)
+  const date = new Date(y, m - 1, d)
+  const month = date.toLocaleDateString(undefined, { month: "short" })
+  const day = date.getDate()
   return (
     <div className="flex shrink-0 flex-col items-center justify-center rounded-lg border border-foreground/15 bg-foreground/5 w-10 py-1.5 gap-0">
       <span className="text-[9px] font-semibold uppercase tracking-widest text-muted-foreground leading-none">
