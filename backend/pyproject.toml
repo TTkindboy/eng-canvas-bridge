@@ -16,11 +16,15 @@ entrypoint = "app.main:app"
 
 [dependency-groups]
 dev = [
-    "ruff>=0.15.6",
+    "ruff>=0.15.7",
+    "ty>=0.0.24",
 ]
 
 [tool.ruff]
 cache-dir = "~/.cache/ruff"
+
+[tool.ruff.lint]
+extend-select = ["FAST", "UP", "SIM", "C4", "FURB"]
 
 # [project.scripts]
 # export-openapi = "scripts.export_openapi:main" # disabled because we would need to implement build system

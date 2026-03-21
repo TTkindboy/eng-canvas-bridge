@@ -21,7 +21,7 @@ export function CourseStep({ onSelect }: CourseStepProps) {
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2 text-muted-foreground text-sm font-medium tracking-wide uppercase">
           <span className="flex size-5 items-center justify-center rounded-full bg-foreground text-background text-xs font-bold">1</span>
-          Step 1 of 2
+          Step 1 of 3
         </div>
         <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">
           Select a course
