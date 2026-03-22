@@ -58,7 +58,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Run tests
+      - name: TypeScript type check
         run: pnpm tsc -b --noEmit
 
       # - name: Lint with ESLint
