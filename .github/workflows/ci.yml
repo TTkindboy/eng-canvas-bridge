@@ -1,4 +1,4 @@
-name: Backend CI
+name: CI
 on:
   push:
     branches: [ "main" ]
@@ -6,8 +6,8 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-    name: python
+  backend:
+    name: backend
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -35,3 +35,32 @@ jobs:
 
       # - name: Run tests
       #   run: uv run pytest
+
+
+  frontend:
+    name: frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: "frontend/package.json"
+
+      - name: "Set up Node.js"
+        uses: actions/setup-node@v3
+        with:
+          node-version: 24 # hardcoded bc i dont have it it package.json 😭
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run tests
+        run: pnpm tsc -b --noEmit
+
+      # - name: Lint with eslint
+      #   run: npm run lint

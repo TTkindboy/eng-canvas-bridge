@@ -1,6 +1,6 @@
 set dotenv-load
 
-frontend_delay := '0.5'
+frontend_delay := '0.75'
 
 [private]
 default:
