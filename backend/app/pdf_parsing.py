@@ -10,7 +10,7 @@ import pymupdf
 from fastapi import APIRouter
 from pydantic import BaseModel, Field, BeforeValidator
 
-from .dependencies import HTTPClient, canvas_auth, SITE_URL
+from .dependencies import HTTPClient, canvas_auth, get_settings
 
 router = APIRouter(prefix="/pdfs")
 
@@ -113,7 +113,7 @@ class Eng10Schedule(BaseModel):
 @router.get("/{file_id}", summary="Get PDF content", response_model_exclude_none=True)
 async def get_pdf_content(client: HTTPClient, file_id: int) -> Eng10Schedule:
     pdf_resp = await client.get(
-        f"{SITE_URL}/files/{file_id}/download", # override baseurl bc no /api/v1
+        f"{get_settings().site_url}/files/{file_id}/download", # override baseurl bc no /api/v1
         headers=canvas_auth(),
         follow_redirects=True,
     )
@@ -124,7 +124,7 @@ async def get_pdf_content(client: HTTPClient, file_id: int) -> Eng10Schedule:
 async def parse_pdf_to_planner(client: HTTPClient, file_id: int, day: Literal["odd", "even"], course_id: int | None = None) -> list[PlannerNote]:
     # DUPLICATED CODE with get_pdf_content, maybe refactor later
     pdf_resp = await client.get(
-        f"{SITE_URL}/files/{file_id}/download", # override baseurl bc no /api/v1
+        f"{get_settings().site_url}/files/{file_id}/download", # override baseurl bc no /api/v1
         headers=canvas_auth(),
         follow_redirects=True,
     )

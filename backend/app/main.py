@@ -10,7 +10,7 @@ from fastapi.routing import APIRoute
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 
 from . import pdf_parsing
-from .dependencies import API_URL, HTTPClient, canvas_auth
+from .dependencies import HTTPClient, canvas_auth, get_settings
 from .pdf_parsing import PlannerNote
 
 # TODO: Propagate Canvas API errors
@@ -42,7 +42,7 @@ class BulkDeleteResult(BaseModel):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    async with httpx.AsyncClient(base_url=API_URL) as client:
+    async with httpx.AsyncClient(base_url=get_settings().api_url) as client:
         yield {"http_client": client}
 
 def custom_generate_unique_id(route: APIRoute):
