@@ -41,7 +41,8 @@
 				"editor.codeLens": false,
 				"vscode-just.lspPath": "/usr/local/bin/just-lsp",
 				"fastapi.cloud.enabled": false,
-				"python.useEnvironmentsExtension": false
+				"python.useEnvironmentsExtension": false,
+				"terminal.integrated.defaultProfile.linux": "zsh" // maybe switch to devcontainers/common-utils use zsh
 			}
 		}
 	}
