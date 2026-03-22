@@ -49,11 +49,11 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         with:
-          package_json_file: "frontend/package.json"
+          package_json_file: "frontend/package.json" # maybe get pnpm to manage node with devEngines in future
 
       - uses: actions/setup-node@v6
         with:
-          node-version: 24 # hardcoded bc i dont have it it package.json 😭
+          node-version-file: "frontend/package.json"
 
       - name: Install dependencies
         run: pnpm install
@@ -61,5 +61,5 @@ jobs:
       - name: Run tests
         run: pnpm tsc -b --noEmit
 
-      # - name: Lint with eslint
-      #   run: npm run lint
+      # - name: Lint with ESLint
+      #   run: pnpm run lint
