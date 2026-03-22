@@ -39,6 +39,14 @@ files = '^backend/(uv\.lock|pyproject\.toml|uv\.toml)$'
 repo = "local"
 
 [[repos.hooks]]
+id = "local-ty"
+name = "ty check"
+language = "system"
+entry = "uv --directory backend run ty check"
+files = '^backend' # maybe increase specificity
+pass_filenames = false
+
+[[repos.hooks]]
 id = "generate-api-client" # maybe migrate to toml 1.1 in the future
 name = "Generate API client"
 language = "system"
