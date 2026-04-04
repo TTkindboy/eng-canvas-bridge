@@ -67,11 +67,11 @@ class PlannerNote(BaseModel):
     # does not include linked object data or workflow state
 
 def extract_lines_from_pdf(pdf_bytes: bytes) -> str: # maybe list[str] later
-    doc = pymupdf.Document(stream=pdf_bytes)
-    assert doc.page_count == 1 # TODO: migrate from assert
+    doc = pymupdf.Document(stream=pdf_bytes) # maybe use context manager 🤷
+    assert doc.page_count == 1 # TODO: migrate from assert # TODO: Support multi page pdfs
     return doc.get_page_text(0)
 
-# MAYBE: abc later
+# MAYBE: abc later # pls do asap this is getting ridiculous(we could also do rust style enum of "ScheduleTypes")
 class Eng10Schedule(BaseModel):
     odd_days: list[PlannerNote] = Field(serialization_alias="odd")
     even_days: list[PlannerNote] = Field(serialization_alias="even")
@@ -95,13 +95,16 @@ class Eng10Schedule(BaseModel):
         )
 
     @staticmethod
-    def _parse_section(section_text: str, course_id: int | None = None) -> list[PlannerNote]:
+    def _parse_section(section_text: str, course_id: int | None = None) -> list[PlannerNote]: # maybe add a extra node section (separated by ; in the source)
         matches = re.findall(
             r"^(?P<weekday>Th|M|T|W|F)\s+(?P<month>[1-9]|1[0-2])/(?P<day>[1-9]|[12]\d|3[01])\s*[-–—]\s*(?P<assignment>.+?)\s*$", # no (?m) because multiline defined below
             section_text,
             re.MULTILINE
         )
-        assert len(matches) == sum(1 for line in section_text.splitlines() if line.strip()) # TODO: migrate from assert
+        assert len(matches) == sum( # TODO: migrate from assert
+            1 for line in section_text.splitlines()
+            if line.strip() and "NO CLASS" not in line # this seems really fragile and dangerous but i'm too lazy to make it better rn
+        )
         return [
             PlannerNote(todo_date=nearest_matching_date(int(month), int(day), weekday), title=assignment, course_id=course_id) # TODO: COMPLETE Parameters
             for weekday, month, day, assignment
