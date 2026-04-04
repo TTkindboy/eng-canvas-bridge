@@ -1,4 +1,4 @@
-# eng-canvas-bridge
+# Friends Seminary English Canvas Bridge
 
 Converts Friends Seminary English schedule PDFs into Canvas planner notes via the Canvas LMS API.
 
