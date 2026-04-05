@@ -41,12 +41,10 @@ frontend-install:
 # maybe separate to add frontend
 alias test := test-backend
 
-# maybe remove -v
-[doc]
 [group('test')]
 [working-directory: 'backend']
-test-backend:
-  uv run pytest -v
+test-backend *FLAGS='-v':
+  uv run pytest {{ FLAGS }}
 
 alias gen := generate
 

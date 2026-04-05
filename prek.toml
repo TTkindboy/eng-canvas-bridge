@@ -47,6 +47,14 @@ files = '^backend' # maybe increase specificity
 pass_filenames = false
 
 [[repos.hooks]]
+id = "local-pytest" # remove if run time ever gets annoying
+name = "pytest"
+language = "system"
+entry = "uv --directory backend run pytest -q --tb=short" # maybe change arguments
+pass_filenames = false
+files = '^backend'
+
+[[repos.hooks]]
 id = "generate-api-client" # maybe migrate to toml 1.1 in the future
 name = "Generate API client"
 language = "system"
