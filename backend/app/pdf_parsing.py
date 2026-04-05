@@ -134,7 +134,7 @@ async def parse_pdf_to_planner(client: HTTPClient, file_id: int, day: Literal["o
     pdf_resp.raise_for_status()
 
     schedule = Eng10Schedule.from_pdf_text(extract_lines_from_pdf(pdf_resp.content), course_id=course_id)
-    return await asyncio.gather(*(add_planner_note(client, note) for note in getattr(schedule, day + "_days")))
+    return await asyncio.gather(*(add_planner_note(client, note) for note in getattr(schedule, day + "_days"))) # maybe add helper function in main.py for this
 
 
 async def add_planner_note(client: HTTPClient, note: PlannerNote) -> PlannerNote: # TODO: return status

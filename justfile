@@ -46,6 +46,12 @@ alias test := test-backend
 test-backend *FLAGS='-v':
   uv run pytest {{ FLAGS }}
 
+[group('test')]
+[working-directory: 'backend']
+snapshot:
+  uv run pytest --inline-snapshot=fix
+  uv run ruff format tests/test_pdf_parsing.py
+
 alias gen := generate
 
 [group('generate')]
