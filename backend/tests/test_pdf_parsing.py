@@ -21,3 +21,7 @@ BASE_DATE = date(2026, 4, 5) # The day I wrote the tests
 )
 def test_nearest_matching_date(month, day, weekday, expected):
     assert nearest_matching_date(month, day, weekday, base_date=BASE_DATE) == expected
+
+def test_impossible_nearest_matching_date():
+    with pytest.raises(AssertionError):
+        nearest_matching_date(2, 30, calendar.MONDAY, base_date=BASE_DATE)
