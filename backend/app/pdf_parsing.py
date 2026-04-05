@@ -14,7 +14,7 @@ from .dependencies import HTTPClient, canvas_auth, get_settings
 
 router = APIRouter(prefix="/pdfs")
 
-WEEKDAY_MAP = {
+WEEKDAY_MAP = { # TODO: ADD WEEKEND PARSING
     "M": calendar.MONDAY,
     "T": calendar.TUESDAY,
     "W": calendar.WEDNESDAY,

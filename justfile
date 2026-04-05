@@ -38,6 +38,16 @@ backend-install:
 frontend-install:
   pnpm install
 
+# maybe separate to add frontend
+alias test := test-backend
+
+# maybe remove -v
+[doc]
+[group('test')]
+[working-directory: 'backend']
+test-backend:
+  uv run pytest -v
+
 alias gen := generate
 
 [group('generate')]

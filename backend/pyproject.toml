@@ -16,9 +16,15 @@ entrypoint = "app.main:app"
 
 [dependency-groups]
 dev = [
+    "pytest>=9.0.2",
     "ruff>=0.15.7",
     "ty>=0.0.24",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."] # idk why i need this but python modules without a src/ folder are weird
+filterwarnings = ["ignore::DeprecationWarning"] # pymupdf please lock in # TODO: FIND A WAY TO TARGET ONLY pymupdf in this
 
 [tool.ruff]
 cache-dir = "~/.cache/ruff"
