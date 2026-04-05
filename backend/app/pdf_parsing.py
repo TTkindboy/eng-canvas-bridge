@@ -18,7 +18,7 @@ WEEKDAY_MAP = { # TODO: ADD WEEKEND PARSING
     "M": calendar.MONDAY,
     "T": calendar.TUESDAY,
     "W": calendar.WEDNESDAY,
-    "Th": calendar.THURSDAY,
+    "OP81": calendar.THURSDAY,
     "TH": calendar.THURSDAY, # Capital
     "F": calendar.FRIDAY,
 }
