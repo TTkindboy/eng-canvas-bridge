@@ -34,7 +34,7 @@ jobs:
         run: uv run ty check --output-format github
 
       - name: Run tests # maybe: move to own job (probably not)
-        run: uv run pytest # maybe add arguments from prek/github output
+        run: uv run pytest -v --tb=short # maybe add arguments from prek/github output
 
 
   frontend:
