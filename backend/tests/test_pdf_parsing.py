@@ -1,5 +1,5 @@
 import calendar
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 
 import pytest
@@ -12,7 +12,7 @@ from app.pdf_parsing import (
     nearest_matching_date,
 )
 
-BASE_DATE = date(2026, 4, 5)  # The day I wrote the tests (fixed anchor date so tests are deterministic)
+pytestmark = pytest.mark.time_machine(datetime(2026, 4, 5, 12, 0))  # The day I wrote the tests (fixed anchor date so tests are deterministic)
 
 
 @pytest.mark.parametrize(  # TODO: Also check x num of random dates and verify existence and closest(idk how i would do that)
@@ -30,12 +30,12 @@ BASE_DATE = date(2026, 4, 5)  # The day I wrote the tests (fixed anchor date so 
     ],
 )
 def test_nearest_matching_date(month, day, weekday, expected):
-    assert nearest_matching_date(month, day, weekday, base_date=BASE_DATE) == expected
+    assert nearest_matching_date(month, day, weekday) == expected
 
 
 def test_impossible_nearest_matching_date():
     with pytest.raises(AssertionError):
-        nearest_matching_date(2, 30, calendar.MONDAY, base_date=BASE_DATE)
+        nearest_matching_date(2, 30, calendar.MONDAY)
 
 
 @pytest.fixture
