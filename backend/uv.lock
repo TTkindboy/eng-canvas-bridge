@@ -111,6 +111,10 @@ dev = [
     { name = "ruff" },
     { name = "ty" },
 ]
+test = [
+    { name = "inline-snapshot" },
+    { name = "pytest" },
+]
 
 [package.metadata]
 requires-dist = [
@@ -126,6 +130,10 @@ dev = [
     { name = "pytest", specifier = ">=9.0.2" },
     { name = "ruff", specifier = ">=0.15.7" },
     { name = "ty", specifier = ">=0.0.24" },
+]
+test = [
+    { name = "inline-snapshot", specifier = ">=0.32.5" },
+    { name = "pytest", specifier = ">=9.0.2" },
 ]
 
 [[package]]
