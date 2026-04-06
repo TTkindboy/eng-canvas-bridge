@@ -9,6 +9,7 @@ dependencies = [
     "httpx>=0.28.1",
     "pydantic>=2.12.5",
     "pymupdf>=1.27.2",
+    "time-machine>=3.2.0",
 ]
 
 [tool.fastapi]
@@ -16,9 +17,20 @@ entrypoint = "app.main:app"
 
 [dependency-groups]
 dev = [
+    {include-group = "test"},
     "ruff>=0.15.7",
     "ty>=0.0.24",
 ]
+test = [
+    "inline-snapshot>=0.32.5",
+    "pytest>=9.0.2",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."] # idk why i need this but python modules without a src/ folder are weird
+filterwarnings = ["ignore:builtin type swig:DeprecationWarning"]
+
 
 [tool.ruff]
 cache-dir = "~/.cache/ruff"

@@ -14,7 +14,7 @@ from .dependencies import HTTPClient, canvas_auth, get_settings
 
 router = APIRouter(prefix="/pdfs")
 
-WEEKDAY_MAP = {
+WEEKDAY_MAP = { # TODO: ADD WEEKEND PARSING
     "M": calendar.MONDAY,
     "T": calendar.TUESDAY,
     "W": calendar.WEDNESDAY,
@@ -125,7 +125,7 @@ async def get_pdf_content(client: HTTPClient, file_id: int) -> Eng10Schedule:
 
 @router.post("/{file_id}", summary="Parse PDF and add to planner")
 async def parse_pdf_to_planner(client: HTTPClient, file_id: int, day: Literal["odd", "even"], course_id: int | None = None) -> list[PlannerNote]:
-    # DUPLICATED CODE with get_pdf_content, maybe refactor later
+    # DUPLICATED CODE with get_pdf_content, maybe refactor later or add session caching
     pdf_resp = await client.get(
         f"{get_settings().site_url}/files/{file_id}/download", # override baseurl bc no /api/v1
         headers=canvas_auth(),
@@ -134,10 +134,11 @@ async def parse_pdf_to_planner(client: HTTPClient, file_id: int, day: Literal["o
     pdf_resp.raise_for_status()
 
     schedule = Eng10Schedule.from_pdf_text(extract_lines_from_pdf(pdf_resp.content), course_id=course_id)
-    return await asyncio.gather(*(add_planner_note(client, note) for note in getattr(schedule, day + "_days")))
+    return await asyncio.gather(*(add_planner_note(client, note) for note in getattr(schedule, day + "_days"))) # maybe add helper function in main.py for this
 
 
 async def add_planner_note(client: HTTPClient, note: PlannerNote) -> PlannerNote: # TODO: return status
+    """Sends a single request to add a planner note"""
     resp = await client.post(
         "/planner_notes",
         headers=canvas_auth(),
