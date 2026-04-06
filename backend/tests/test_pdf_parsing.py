@@ -40,7 +40,7 @@ def test_impossible_nearest_matching_date():
 
 @pytest.fixture
 def sample_pdf_bytes():
-    return (Path(__file__).parent / "data" / "eng10_sep-oct.pdf").read_bytes() # TODO: maybe switch to a more abridged schedule
+    return (Path(__file__).parent / "data" / "eng10_sep-oct.pdf").read_bytes()  # TODO: maybe switch to a more abridged schedule
 
 
 def test_extract_and_parse_full_pdf(sample_pdf_bytes: bytes):
