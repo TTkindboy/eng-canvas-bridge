@@ -29,7 +29,8 @@ test = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."] # idk why i need this but python modules without a src/ folder are weird
-filterwarnings = ["ignore::DeprecationWarning"] # pymupdf please lock in # TODO: FIND A WAY TO TARGET ONLY pymupdf in this
+filterwarnings = ["ignore:builtin type [Ss]wig:DeprecationWarning"]
+
 
 [tool.ruff]
 cache-dir = "~/.cache/ruff"
