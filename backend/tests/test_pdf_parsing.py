@@ -12,9 +12,7 @@ from app.pdf_parsing import (
     nearest_matching_date,
 )
 
-BASE_DATE = date(
-    2026, 4, 5
-)  # The day I wrote the tests (fixed anchor date so tests are deterministic)
+BASE_DATE = date(2026, 4, 5)  # The day I wrote the tests (fixed anchor date so tests are deterministic)
 
 
 @pytest.mark.parametrize(  # TODO: Also check x num of random dates and verify existence and closest(idk how i would do that)
