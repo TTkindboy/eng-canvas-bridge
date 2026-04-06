@@ -10,7 +10,7 @@ import pymupdf
 from fastapi import APIRouter
 from pydantic import BaseModel, Field, BeforeValidator
 
-from .dependencies import HTTPClient, canvas_auth, get_settings
+from ..dependencies import HTTPClient, canvas_auth, get_settings
 
 router = APIRouter(prefix="/pdfs")
 

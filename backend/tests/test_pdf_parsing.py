@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from inline_snapshot import snapshot
 
-from app.pdf_parsing import (
+from app.routers.pdfs import (
     Eng10Schedule,
     PlannerNote,
     extract_lines_from_pdf,
