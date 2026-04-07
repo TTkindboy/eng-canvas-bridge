@@ -1,9 +1,9 @@
 import useSWR from "swr"
-import { ArrowLeft, FileText, Calendar, ChevronRight } from "lucide-react"
+import { ArrowLeft, FileText, Calendar } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
+import { SelectableItem } from "@/components/selectable-item"
 import { fetchCourseFiles, type FileOption } from "@/lib/api"
 import { isSchedule } from "@/lib/highlighting"
-import { cn } from "@/lib/utils"
 
 interface FileStepProps {
   courseId: string
@@ -56,41 +56,15 @@ export function FileStep({ courseId, courseName, onFileSelect, onBack }: FileSte
         {!isLoading && sortedPdfs?.length === 0 && (
           <p className="text-muted-foreground text-sm py-4">No files found for this course.</p>
         )}
-        {sortedPdfs?.map((pdf) => {
-          const hasMonth = isSchedule(pdf.title)
-          const Icon = hasMonth ? Calendar : FileText
-
-          return (
-            <button
-              key={pdf.id}
-              onClick={() => onFileSelect(pdf.id, pdf.title)}
-              className={cn(
-                "group flex items-center justify-between rounded-xl border px-4 py-3",
-                "text-left text-sm transition-all duration-150",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                hasMonth
-                  ? "border-primary/35 bg-primary/5 font-bold hover:bg-primary/10 hover:border-primary/55 hover:shadow-md"
-                  : "border-border bg-card font-medium text-card-foreground hover:border-primary/25 hover:bg-accent hover:shadow-sm"
-              )}
-            >
-              <div className="flex items-center gap-3 min-w-0">
-                <Icon className={cn(
-                  "size-4 shrink-0 transition-colors",
-                  hasMonth
-                    ? "text-primary"
-                    : "text-muted-foreground group-hover:text-foreground"
-                )} />
-                <span className="truncate">{pdf.title}</span>
-              </div>
-              <ChevronRight className={cn(
-                "size-4 shrink-0 transition-colors",
-                hasMonth
-                  ? "text-primary/70"
-                  : "text-muted-foreground/50 group-hover:text-foreground"
-              )} />
-            </button>
-          )
-        })}
+        {sortedPdfs?.map((pdf) => (
+          <SelectableItem
+            key={pdf.id}
+            icon={isSchedule(pdf.title) ? Calendar : FileText}
+            label={pdf.title}
+            highlighted={isSchedule(pdf.title)}
+            onClick={() => onFileSelect(pdf.id, pdf.title)}
+          />
+        ))}
       </div>
     </div>
   )

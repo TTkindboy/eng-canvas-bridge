@@ -1,9 +1,9 @@
 import useSWR from "swr"
-import { ChevronRight, GraduationCap } from "lucide-react"
+import { GraduationCap } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
+import { SelectableItem } from "@/components/selectable-item"
 import { fetchCourses, type CourseOption } from "@/lib/api"
 import { isEnglishCourse } from "@/lib/highlighting"
-import { cn } from "@/lib/utils"
 
 interface CourseStepProps {
   onSelect: (id: string, name: string) => void
@@ -41,35 +41,15 @@ export function CourseStep({ onSelect }: CourseStepProps) {
         {error && (
           <p className="text-destructive text-sm">Failed to load courses.</p>
         )}
-        {sortedCourses?.map((course) => {
-          const isEnglish = isEnglishCourse(course.name)
-          return (
-            <button
-              key={course.id}
-              onClick={() => onSelect(course.id, course.name)}
-              className={cn(
-                "group flex items-center justify-between rounded-xl border px-4 py-3",
-                "text-left text-sm transition-all duration-150",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                isEnglish
-                  ? "border-primary/35 bg-primary/5 font-bold hover:bg-primary/10 hover:border-primary/55 hover:shadow-md"
-                  : "border-border bg-card font-medium text-card-foreground hover:border-primary/25 hover:bg-accent hover:shadow-sm"
-              )}
-            >
-              <div className="flex items-center gap-3 min-w-0">
-                <GraduationCap className={cn(
-                  "size-4 shrink-0 transition-colors",
-                  isEnglish ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
-                )} />
-                <span className="truncate">{course.name}</span>
-              </div>
-              <ChevronRight className={cn(
-                "size-4 shrink-0 transition-colors",
-                isEnglish ? "text-primary/70" : "text-muted-foreground/50 group-hover:text-foreground"
-              )} />
-            </button>
-          )
-        })}
+        {sortedCourses?.map((course) => (
+          <SelectableItem
+            key={course.id}
+            icon={GraduationCap}
+            label={course.name}
+            highlighted={isEnglishCourse(course.name)}
+            onClick={() => onSelect(course.id, course.name)}
+          />
+        ))}
       </div>
     </div>
   )
