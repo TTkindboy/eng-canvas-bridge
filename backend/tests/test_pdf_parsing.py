@@ -5,8 +5,8 @@ from pathlib import Path
 import pytest
 from inline_snapshot import snapshot
 
-from app.routers.pdfs import Eng10Schedule, PlannerNote
-from app.parsers.base import nearest_matching_date, TextPdfMixin
+from app.routers.pdfs import Eng10Schedule
+from app.parsers.base import nearest_matching_date, PlannerNote
 
 pytestmark = pytest.mark.time_machine(datetime(2026, 4, 5, 12, 0))  # The day I wrote the tests (fixed anchor date so tests are deterministic)
 
@@ -40,7 +40,7 @@ def sample_pdf_bytes():
 
 
 def test_extract_and_parse_full_pdf(sample_pdf_bytes: bytes):
-    schedule = Eng10Schedule.from_pdf_text(TextPdfMixin.extract_text_from_pdf(sample_pdf_bytes))
+    schedule = Eng10Schedule.from_pdf_bytes(sample_pdf_bytes)
     assert schedule == snapshot(
         Eng10Schedule(
             odd_days=[

@@ -1,80 +1,14 @@
 from __future__ import annotations
 import asyncio
-from typing import Literal, Annotated, Any
-from datetime import date, datetime
-import re
+from typing import Literal
 
-import pymupdf
 from fastapi import APIRouter
-from pydantic import BaseModel, Field, BeforeValidator
 
 from ..dependencies import HTTPClient, canvas_auth, get_settings
+from ..parsers.eng10 import Eng10Schedule
+from ..parsers.base import PlannerNote
 
 router = APIRouter(prefix="/pdfs")
-
-def _parse_date(v: Any) -> date:
-    if isinstance(v, str):
-        return datetime.fromisoformat(v).date()
-    if isinstance(v, datetime):
-        return v.date()
-    return v
-
-type ParsedDate = Annotated[
-    date,
-    BeforeValidator(_parse_date)
-]
-
-class PlannerNote(BaseModel):
-    id: int | None = None # ONLY POST CREATION
-    title: str
-    description: str | None = None
-    user_id: int | None = None # ONLY POST CREATION
-    course_id: int | None = None # you should have to explicitly set to None
-    todo_date: ParsedDate | None # you should have to explicitly set to None # MAYBE: make AwareDateTime later
-    # does not include linked object data or workflow state
-
-
-# MAYBE: abc later # pls do asap this is getting ridiculous(we could also do rust style enum of "ScheduleTypes")
-class Eng10Schedule(BaseModel):
-    odd_days: list[PlannerNote] = Field(serialization_alias="odd")
-    even_days: list[PlannerNote] = Field(serialization_alias="even")
-
-    @classmethod
-    def from_pdf_text(cls, pdf_text: str, course_id: int | None = None) -> Eng10Schedule:
-        matches = re.findall(
-            r"^(ODD|EVEN) DAYS\s*$(.*?)(?=^(?:ODD|EVEN) DAYS\s*$|\Z)", # no (?ms) inline because defined down below
-            pdf_text,
-            re.MULTILINE | re.DOTALL
-        )
-        assert len({k for k, _ in matches}) == len(matches) # check no duplicate sections # TODO: migrate from assert
-        result: dict[str, str] = dict(matches)
-        return cls._from_sections(result, course_id=course_id)
-
-    @classmethod
-    def _from_sections(cls, pdf_text: dict[str, str], course_id: int | None = None) -> Eng10Schedule:
-        return cls(
-            odd_days=cls._parse_section(pdf_text["ODD"], course_id=course_id),
-            even_days=cls._parse_section(pdf_text["EVEN"], course_id=course_id)
-        )
-
-    @staticmethod
-    def _parse_section(section_text: str, course_id: int | None = None) -> list[PlannerNote]: # maybe add a extra node section (separated by ; in the source)
-        matches = re.findall(
-            r"^(?P<weekday>Th|M|T|W|F)\s+(?P<month>[1-9]|1[0-2])/(?P<day>[1-9]|[12]\d|3[01])\s*[-–—]\s*(?P<assignment>.+?)\s*$", # no (?m) because multiline defined below
-            section_text,
-            re.MULTILINE
-        )
-        assert len(matches) == sum( # TODO: migrate from assert
-            1 for line in section_text.splitlines()
-            if line.strip() and "NO CLASS" not in line # this seems really fragile and dangerous but i'm too lazy to make it better rn
-        )
-        return [
-            PlannerNote(todo_date=nearest_matching_date(int(month), int(day), weekday), title=assignment, course_id=course_id) # TODO: COMPLETE Parameters
-            for weekday, month, day, assignment
-            in matches
-        ]
-
-
 
 @router.get("/{file_id}", summary="Get PDF content", response_model_exclude_none=True)
 async def get_pdf_content(client: HTTPClient, file_id: int) -> Eng10Schedule:
@@ -84,7 +18,7 @@ async def get_pdf_content(client: HTTPClient, file_id: int) -> Eng10Schedule:
         follow_redirects=True,
     )
     pdf_resp.raise_for_status()
-    return Eng10Schedule.from_pdf_text(extract_lines_from_pdf(pdf_resp.content))
+    return Eng10Schedule.from_pdf_bytes(pdf_resp.content)
 
 @router.post("/{file_id}", summary="Parse PDF and add to planner")
 async def parse_pdf_to_planner(client: HTTPClient, file_id: int, day: Literal["odd", "even"], course_id: int | None = None) -> list[PlannerNote]:
@@ -96,7 +30,7 @@ async def parse_pdf_to_planner(client: HTTPClient, file_id: int, day: Literal["o
     )
     pdf_resp.raise_for_status()
 
-    schedule = Eng10Schedule.from_pdf_text(extract_lines_from_pdf(pdf_resp.content), course_id=course_id)
+    schedule = Eng10Schedule.from_pdf_bytes(pdf_resp.content, course_id=course_id)
     return await asyncio.gather(*(add_planner_note(client, note) for note in getattr(schedule, day + "_days"))) # maybe add helper function in main.py for this
 
 

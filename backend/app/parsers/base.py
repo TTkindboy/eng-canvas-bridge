@@ -1,12 +1,34 @@
 from __future__ import annotations
-import pymupdf
-from datetime import date
-from math import inf
 import calendar
-from pydantic import BaseModel, RootModel
 from abc import ABC, abstractmethod
+from datetime import date, datetime
+from math import inf
+from typing import Annotated, Any
 
-from ..routers.pdfs import PlannerNote # TODO: maybe move here or something later if this gets too circular
+import pymupdf
+from pydantic import BaseModel, BeforeValidator, Field, RootModel
+
+
+def _parse_date(v: Any) -> date:
+    if isinstance(v, str):
+        return datetime.fromisoformat(v).date()
+    if isinstance(v, datetime):
+        return v.date()
+    return v
+
+type ParsedDate = Annotated[
+    date,
+    BeforeValidator(_parse_date)
+]
+
+class PlannerNote(BaseModel): # TODO: maybe move to separate file later
+    id: int | None = None # ONLY POST CREATION
+    title: str
+    description: str | None = None
+    user_id: int | None = None # ONLY POST CREATION
+    course_id: int | None = None # you should have to explicitly set to None
+    todo_date: ParsedDate | None # you should have to explicitly set to None # MAYBE: make AwareDateTime later
+    # does not include linked object data or workflow state
 
 WEEKDAY_MAP = { # TODO: ADD WEEKEND PARSING
     "M": calendar.MONDAY,
@@ -55,8 +77,8 @@ class BaseSchedule(ABC):
         ...
 
 class DualSchedule(BaseModel, BaseSchedule, ABC):
-    odd_days: list[PlannerNote]
-    even_days: list[PlannerNote]
+    odd_days: list[PlannerNote] = Field(serialization_alias="odd")
+    even_days: list[PlannerNote] = Field(serialization_alias="even")
 
 class SingleSchedule(RootModel[list[PlannerNote]], BaseSchedule, ABC):
     ...
