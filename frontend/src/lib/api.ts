@@ -1,5 +1,5 @@
 import { client } from '@/lib/client/client.gen'
-import { getCourses, getPdfs, getPdfContent, parsePdfToPlanner } from '@/lib/client'
+import { getCourses, getPdfs, previewSchedule, parsePdfToPlanner } from '@/lib/client'
 import type { Course, CourseFile, Eng10Schedule, PlannerNote } from '@/lib/client'
 
 client.setConfig({
@@ -42,7 +42,7 @@ export async function fetchCourseFiles(courseId: string): Promise<FileOption[]> 
 }
 
 export async function fetchSchedulePreview(fileId: string): Promise<Eng10Schedule> {
-  const { data } = await getPdfContent({
+  const { data } = await previewSchedule({
     path: { file_id: Number(fileId) },
     throwOnError: true,
   })

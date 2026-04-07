@@ -141,7 +141,7 @@ export type ValidationError = {
     };
 };
 
-export type GetPdfContentData = {
+export type PreviewScheduleData = {
     body?: never;
     path: {
         /**
@@ -153,23 +153,23 @@ export type GetPdfContentData = {
     url: '/pdfs/{file_id}';
 };
 
-export type GetPdfContentErrors = {
+export type PreviewScheduleErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type GetPdfContentError = GetPdfContentErrors[keyof GetPdfContentErrors];
+export type PreviewScheduleError = PreviewScheduleErrors[keyof PreviewScheduleErrors];
 
-export type GetPdfContentResponses = {
+export type PreviewScheduleResponses = {
     /**
      * Successful Response
      */
     200: Eng10Schedule;
 };
 
-export type GetPdfContentResponse = GetPdfContentResponses[keyof GetPdfContentResponses];
+export type PreviewScheduleResponse = PreviewScheduleResponses[keyof PreviewScheduleResponses];
 
 export type ParsePdfToPlannerData = {
     body?: never;

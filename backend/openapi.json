@@ -7,8 +7,8 @@
   "paths": {
     "/pdfs/{file_id}": {
       "get": {
-        "summary": "Get PDF content",
-        "operationId": "get_pdf_content",
+        "summary": "Preview schedule from PDF",
+        "operationId": "preview_schedule",
         "parameters": [
           {
             "name": "file_id",

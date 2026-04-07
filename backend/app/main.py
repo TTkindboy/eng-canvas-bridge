@@ -9,9 +9,9 @@ from fastapi import FastAPI
 from fastapi.routing import APIRoute
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 
-from . import pdf_parsing
+from .routers import pdfs
+from .parsers.base import PlannerNote
 from .dependencies import HTTPClient, canvas_auth, get_settings
-from .pdf_parsing import PlannerNote
 
 # TODO: Propagate Canvas API errors
 # TODO: Implement pagination helper
@@ -49,7 +49,7 @@ def custom_generate_unique_id(route: APIRoute):
     return route.name # TODO: Add tags to id-gen after I implement them
 
 app = FastAPI(lifespan=lifespan, generate_unique_id_function=custom_generate_unique_id)
-app.include_router(pdf_parsing.router)
+app.include_router(pdfs.router)
 
 @app.get("/courses")
 async def get_courses(client: HTTPClient, inactive: bool = False) -> list[Course]:

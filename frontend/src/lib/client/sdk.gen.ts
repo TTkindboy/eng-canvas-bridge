@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { DeleteNotesData, DeleteNotesErrors, DeleteNotesResponses, GetCoursesData, GetCoursesErrors, GetCoursesResponses, GetPdfContentData, GetPdfContentErrors, GetPdfContentResponses, GetPdfsData, GetPdfsErrors, GetPdfsResponses, ParsePdfToPlannerData, ParsePdfToPlannerErrors, ParsePdfToPlannerResponses } from './types.gen';
+import type { DeleteNotesData, DeleteNotesErrors, DeleteNotesResponses, GetCoursesData, GetCoursesErrors, GetCoursesResponses, GetPdfsData, GetPdfsErrors, GetPdfsResponses, ParsePdfToPlannerData, ParsePdfToPlannerErrors, ParsePdfToPlannerResponses, PreviewScheduleData, PreviewScheduleErrors, PreviewScheduleResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -19,9 +19,9 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 };
 
 /**
- * Get PDF content
+ * Preview schedule from PDF
  */
-export const getPdfContent = <ThrowOnError extends boolean = false>(options: Options<GetPdfContentData, ThrowOnError>) => (options.client ?? client).get<GetPdfContentResponses, GetPdfContentErrors, ThrowOnError>({ url: '/pdfs/{file_id}', ...options });
+export const previewSchedule = <ThrowOnError extends boolean = false>(options: Options<PreviewScheduleData, ThrowOnError>) => (options.client ?? client).get<PreviewScheduleResponses, PreviewScheduleErrors, ThrowOnError>({ url: '/pdfs/{file_id}', ...options });
 
 /**
  * Parse PDF and add to planner
