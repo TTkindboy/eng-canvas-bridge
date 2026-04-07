@@ -10,8 +10,8 @@ from ..parsers.base import PlannerNote
 
 router = APIRouter(prefix="/pdfs")
 
-@router.get("/{file_id}", summary="Get PDF content", response_model_exclude_none=True)
-async def get_pdf_content(client: HTTPClient, file_id: int) -> Eng10Schedule:
+@router.get("/{file_id}", summary="Preview schedule from PDF", response_model_exclude_none=True)
+async def preview_schedule(client: HTTPClient, file_id: int) -> Eng10Schedule:
     pdf_resp = await client.get(
         f"{get_settings().site_url}/files/{file_id}/download", # override baseurl bc no /api/v1
         headers=canvas_auth(),
@@ -22,7 +22,7 @@ async def get_pdf_content(client: HTTPClient, file_id: int) -> Eng10Schedule:
 
 @router.post("/{file_id}", summary="Parse PDF and add to planner")
 async def parse_pdf_to_planner(client: HTTPClient, file_id: int, day: Literal["odd", "even"], course_id: int | None = None) -> list[PlannerNote]:
-    # DUPLICATED CODE with get_pdf_content, maybe refactor later or add session caching
+    # DUPLICATED CODE with preview_schedule, maybe refactor later or add session caching
     pdf_resp = await client.get(
         f"{get_settings().site_url}/files/{file_id}/download", # override baseurl bc no /api/v1
         headers=canvas_auth(),
