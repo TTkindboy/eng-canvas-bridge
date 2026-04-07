@@ -3,7 +3,7 @@ import { getCourses, getPdfs, previewSchedule, parsePdfToPlanner } from '@/lib/c
 import type { Course, CourseFile, Eng10Schedule, PlannerNote } from '@/lib/client'
 
 client.setConfig({
-  baseUrl: (import.meta.env.VITE_API_BASE_URL ?? '/api').replace(/\/$/, ''),
+  baseUrl: import.meta.env.PROD ? import.meta.env.VITE_API_URL : '/api',
 })
 
 export interface CourseOption {
