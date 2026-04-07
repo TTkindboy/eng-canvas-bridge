@@ -28,7 +28,7 @@ class Eng10Schedule(DualSchedule, TextPdfMixin):
     @staticmethod
     def _parse_section(section_text: str, course_id: int | None = None) -> list[PlannerNote]: # maybe add a extra node section (separated by ; in the source)
         matches = re.findall(
-            r"^(?P<weekday>Th|M|T|W|F)\s+(?P<month>[1-9]|1[0-2])/(?P<day>[1-9]|[12]\d|3[01])\s*[-–—]\s*(?P<assignment>.+?)\s*$", # no (?m) because multiline defined below
+            r"^(?P<weekday>Th|M|T|W|F)\s+(?P<month>[1-9]|1[0-2])/(?P<day>[1-9]|[12]\d|3[01])\s*(?:--|[-–—])\s*(?P<assignment>.+?)\s*$", # no (?m) because multiline defined below
             section_text,
             re.MULTILINE
         )

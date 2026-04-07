@@ -49,7 +49,7 @@ def test_extract_and_parse_full_pdf(sample_pdf_bytes: bytes):
                 ),
                 PlannerNote(title="Discuss East/West", todo_date=date(2025, 9, 10)),
                 PlannerNote(
-                    title="- East/West In-class Writing (ICW); Start Shooting an Elephant in class",
+                    title="East/West In-class Writing (ICW); Start Shooting an Elephant in class",
                     todo_date=date(2025, 9, 12),
                 ),
                 PlannerNote(
@@ -106,7 +106,7 @@ def test_extract_and_parse_full_pdf(sample_pdf_bytes: bytes):
                 ),
                 PlannerNote(title="Discuss East/West", todo_date=date(2025, 9, 11)),
                 PlannerNote(
-                    title="- East/West In-class Writing (ICW); Start Shooting an Elephant in class",
+                    title="East/West In-class Writing (ICW); Start Shooting an Elephant in class",
                     todo_date=date(2025, 9, 15),
                 ),
                 PlannerNote(
