@@ -1,4 +1,5 @@
 from __future__ import annotations
+import pymupdf
 from datetime import date
 from math import inf
 import calendar
@@ -40,8 +41,11 @@ def nearest_matching_date(month: int, day: int, weekday: str | int | calendar.Da
 
 class TextPdfMixin:
     @staticmethod
-    def extract_text_from_pdf(pdf_bytes: bytes) -> str: # maybe list[str] later
-        pass
+    def extract_text_from_pdf(pdf_bytes: bytes) -> str:
+        doc = pymupdf.Document(stream=pdf_bytes) # maybe use context manager 🤷
+        assert doc.page_count == 1 # TODO: migrate from assert # TODO: Support multi page pdfs
+        return doc.get_page_text(0)
+
 
 
 class BaseSchedule(ABC):

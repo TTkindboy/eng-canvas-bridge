@@ -33,10 +33,6 @@ class PlannerNote(BaseModel):
     todo_date: ParsedDate | None # you should have to explicitly set to None # MAYBE: make AwareDateTime later
     # does not include linked object data or workflow state
 
-def extract_lines_from_pdf(pdf_bytes: bytes) -> str: # maybe list[str] later
-    doc = pymupdf.Document(stream=pdf_bytes) # maybe use context manager 🤷
-    assert doc.page_count == 1 # TODO: migrate from assert # TODO: Support multi page pdfs
-    return doc.get_page_text(0)
 
 # MAYBE: abc later # pls do asap this is getting ridiculous(we could also do rust style enum of "ScheduleTypes")
 class Eng10Schedule(BaseModel):
