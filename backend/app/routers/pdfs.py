@@ -1,8 +1,6 @@
 from __future__ import annotations
 import asyncio
 from typing import Literal, Annotated, Any
-from math import inf
-import calendar
 from datetime import date, datetime
 import re
 
@@ -13,37 +11,6 @@ from pydantic import BaseModel, Field, BeforeValidator
 from ..dependencies import HTTPClient, canvas_auth, get_settings
 
 router = APIRouter(prefix="/pdfs")
-
-WEEKDAY_MAP = { # TODO: ADD WEEKEND PARSING
-    "M": calendar.MONDAY,
-    "T": calendar.TUESDAY,
-    "W": calendar.WEDNESDAY,
-    "Th": calendar.THURSDAY,
-    "TH": calendar.THURSDAY, # Capital
-    "F": calendar.FRIDAY,
-}
-
-def nearest_matching_date(month: int, day: int, weekday: str | int | calendar.Day, base_date: date | None = None) -> date:
-    if base_date is None:
-        base_date = date.today()
-    if isinstance(weekday, str):
-        weekday = WEEKDAY_MAP[weekday]
-    best = None
-    best_distance = inf
-
-    for year in range(base_date.year - 6, base_date.year + 7): # MAYBE: adjust bounds later
-        try:
-            d = date(year, month, day)
-        except ValueError:
-            continue
-        if d.weekday() != weekday:
-            continue
-        distance = abs((d - base_date).days)
-        if distance < best_distance:
-            best = d
-            best_distance = distance
-    assert best is not None # TODO: migrate from assert
-    return best
 
 def _parse_date(v: Any) -> date:
     if isinstance(v, str):

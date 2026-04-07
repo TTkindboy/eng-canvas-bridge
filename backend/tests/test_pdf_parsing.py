@@ -9,8 +9,8 @@ from app.routers.pdfs import (
     Eng10Schedule,
     PlannerNote,
     extract_lines_from_pdf,
-    nearest_matching_date,
 )
+from app.parsers.base import nearest_matching_date
 
 pytestmark = pytest.mark.time_machine(datetime(2026, 4, 5, 12, 0))  # The day I wrote the tests (fixed anchor date so tests are deterministic)
 
