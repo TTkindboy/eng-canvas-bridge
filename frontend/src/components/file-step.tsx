@@ -28,7 +28,7 @@ export function FileStep({ courseId, courseName, onFileSelect, onBack }: FileSte
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2 text-muted-foreground text-sm font-medium tracking-wide uppercase">
-          <span className="flex size-5 items-center justify-center rounded-full bg-foreground text-background text-xs font-bold">2</span>
+          <span className="flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">2</span>
           Step 2 of 3
         </div>
         <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">
@@ -69,15 +69,15 @@ export function FileStep({ courseId, courseName, onFileSelect, onBack }: FileSte
                 "text-left text-sm transition-all duration-150",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                 hasMonth
-                  ? "border-foreground/40 bg-foreground/5 font-bold hover:bg-foreground/10 hover:border-foreground/60 hover:shadow-md"
-                  : "border-border bg-card font-medium text-card-foreground hover:border-foreground/30 hover:bg-accent hover:shadow-sm"
+                  ? "border-primary/35 bg-primary/5 font-bold hover:bg-primary/10 hover:border-primary/55 hover:shadow-md"
+                  : "border-border bg-card font-medium text-card-foreground hover:border-primary/25 hover:bg-accent hover:shadow-sm"
               )}
             >
               <div className="flex items-center gap-3 min-w-0">
                 <Icon className={cn(
                   "size-4 shrink-0 transition-colors",
                   hasMonth
-                    ? "text-foreground"
+                    ? "text-primary"
                     : "text-muted-foreground group-hover:text-foreground"
                 )} />
                 <span className="truncate">{pdf.title}</span>
@@ -85,7 +85,7 @@ export function FileStep({ courseId, courseName, onFileSelect, onBack }: FileSte
               <ChevronRight className={cn(
                 "size-4 shrink-0 transition-colors",
                 hasMonth
-                  ? "text-foreground/70"
+                  ? "text-primary/70"
                   : "text-muted-foreground/50 group-hover:text-foreground"
               )} />
             </button>
