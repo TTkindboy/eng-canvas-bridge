@@ -20,9 +20,7 @@ export function FileStep({ courseId, courseName, onFileSelect, onBack }: FileSte
     ([, currentCourseId]: readonly [string, string]) => fetchCourseFiles(currentCourseId)
   )
 
-  const sortedPdfs = pdfs?.toSorted(
-    (a, b) => Number(isSchedule(b.title)) - Number(isSchedule(a.title))
-  )
+  const visiblePdfs = pdfs?.filter(f => isSchedule(f.title))
 
   return (
     <div className="flex flex-col gap-6">
@@ -32,7 +30,7 @@ export function FileStep({ courseId, courseName, onFileSelect, onBack }: FileSte
           Step 2 of 3
         </div>
         <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">
-          Select a file
+          Select a schedule
         </h1>
         <button
           onClick={onBack}
@@ -53,15 +51,15 @@ export function FileStep({ courseId, courseName, onFileSelect, onBack }: FileSte
         {error && (
           <p className="text-destructive text-sm">Failed to load files.</p>
         )}
-        {!isLoading && sortedPdfs?.length === 0 && (
+        {!isLoading && visiblePdfs?.length === 0 && (
           <p className="text-muted-foreground text-sm py-4">No files found for this course.</p>
         )}
-        {sortedPdfs?.map((pdf) => (
+        {visiblePdfs?.map((pdf, index) => (
           <SelectableItem
             key={pdf.id}
             icon={isSchedule(pdf.title) ? Calendar : FileText}
             label={pdf.title}
-            highlighted={isSchedule(pdf.title)}
+            highlighted={index === 0}
             onClick={() => onFileSelect(pdf.id, pdf.title)}
           />
         ))}
