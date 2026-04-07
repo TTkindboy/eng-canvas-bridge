@@ -10,8 +10,8 @@ from fastapi.routing import APIRoute
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 
 from .routers import pdfs
+from .parsers.base import PlannerNote
 from .dependencies import HTTPClient, canvas_auth, get_settings
-from .routers.pdfs import PlannerNote
 
 # TODO: Propagate Canvas API errors
 # TODO: Implement pagination helper

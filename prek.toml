@@ -58,6 +58,6 @@ files = '^backend'
 id = "generate-api-client" # maybe migrate to toml 1.1 in the future
 name = "Generate API client"
 language = "system"
-entry = "just generate"
+entry = "just generate" # maybe improve so doesnt fail if pnpm isnt installed (either switch approach entirely or backup to npm)
 pass_filenames = false
 files = '^backend/app/'
