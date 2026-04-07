@@ -14,7 +14,7 @@ export default defineConfig({
   server: {
     open: true,
     host: "0.0.0.0",
-    proxy: {
+    proxy: { // Only runs in dev to avoid CORS issues
       "/api": {
         target: "http://127.0.0.1:8000",
         changeOrigin: true,
