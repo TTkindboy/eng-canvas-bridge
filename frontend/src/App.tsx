@@ -42,7 +42,6 @@ export default function App() {
           <SchedulePreviewStep
             selectedFile={selectedFile}
             courseId={selectedCourse.id}
-            courseName={selectedCourse.name}
             onBack={handleBackToFiles}
           />
         )}

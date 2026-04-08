@@ -10,7 +10,6 @@ import { cn } from "@/lib/utils"
 interface SchedulePreviewStepProps {
   selectedFile: SelectedFile
   courseId: string
-  courseName: string
   onBack: () => void
 }
 
@@ -144,10 +143,21 @@ export function SchedulePreviewStep({
   const [added, setAdded] = useState<Set<"odd" | "even">>(new Set())
   const [addError, setAddError] = useState<string | null>(null)
   const fileId = selectedFile.source === "canvas" ? selectedFile.id : undefined
+  const previewKey =
+    selectedFile.source === "canvas"
+      ? (["schedule-preview", "canvas", selectedFile.id] as const)
+      : ([
+          "schedule-preview",
+          "upload",
+          selectedFile.title,
+          selectedFile.file.name,
+          selectedFile.file.size,
+          selectedFile.file.lastModified,
+        ] as const)
 
   const { data: schedule, error, isLoading } = useSWR<Eng10Schedule>(
-    fileId ? (["schedule-preview", fileId] as const) : null,
-    ([, id]: [string, string]) => fetchSchedulePreview(id),
+    previewKey,
+    () => fetchSchedulePreview(selectedFile),
   )
 
   const handleAdd = async (day: "odd" | "even") => {
@@ -207,10 +217,6 @@ export function SchedulePreviewStep({
         <p className="text-destructive text-sm">Failed to load schedule preview.</p>
       )}
 
-      {!fileId && (
-        <p className="text-muted-foreground text-sm">Uploaded files are not wired into preview yet.</p>
-      )}
-
       {/* Content */}
       {schedule && (
         <div className="flex flex-col gap-3">
@@ -223,32 +229,38 @@ export function SchedulePreviewStep({
 
           <NoteList notes={activeNotes} />
 
-          <Button
-            onClick={() => handleAdd(activeTab)}
-            disabled={isDisabled}
-            variant={isDone ? "outline" : "default"}
-            className={cn(
-              "w-full gap-2 transition-all",
-              isDone && "border-foreground/20 text-muted-foreground",
-            )}
-          >
-            {isAddingActive ? (
-              <>
-                <Spinner className="size-4" />
-                Adding...
-              </>
-            ) : isDone ? (
-              <>
-                <CheckCircle2 className="size-4" />
-                Added to planner
-              </>
-            ) : (
-              <>
-                <CalendarPlus className="size-4" />
-                Add {activeTab} days to Canvas
-              </>
-            )}
-          </Button>
+          {fileId ? (
+            <Button
+              onClick={() => handleAdd(activeTab)}
+              disabled={isDisabled}
+              variant={isDone ? "outline" : "default"}
+              className={cn(
+                "w-full gap-2 transition-all",
+                isDone && "border-foreground/20 text-muted-foreground",
+              )}
+            >
+              {isAddingActive ? (
+                <>
+                  <Spinner className="size-4" />
+                  Adding...
+                </>
+              ) : isDone ? (
+                <>
+                  <CheckCircle2 className="size-4" />
+                  Added to planner
+                </>
+              ) : (
+                <>
+                  <CalendarPlus className="size-4" />
+                  Add {activeTab} days to Canvas
+                </>
+              )}
+            </Button>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Adding uploaded PDFs to Canvas is not wired up yet.
+            </p>
+          )}
 
           {addError && (
             <p className="text-destructive text-sm">{addError}</p>

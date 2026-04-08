@@ -20,6 +20,11 @@ async def preview_schedule(client: HTTPClient, file_id: int) -> Eng10Schedule:
     pdf_resp.raise_for_status()
     return Eng10Schedule.from_pdf_bytes(pdf_resp.content)
 
+@router.post("/upload", description="Preview schedule from PDF upload")
+async def preview_uploaded_schedule(pdf: UploadFile) -> Eng10Schedule:
+    return Eng10Schedule.from_pdf_bytes(await pdf.read())
+
+
 @router.post("/{file_id}", summary="Parse PDF and add to planner")
 async def parse_pdf_to_planner(client: HTTPClient, file_id: int, day: Literal["odd", "even"], course_id: int | None = None) -> list[PlannerNote]:
     # DUPLICATED CODE with preview_schedule, maybe refactor later or add session caching
@@ -43,7 +48,3 @@ async def add_planner_note(client: HTTPClient, note: PlannerNote) -> PlannerNote
     )
     resp.raise_for_status()
     return PlannerNote.model_validate(resp.json())
-
-@router.post("/upload", description="Preview schedule from PDF upload")
-async def preview_uploaded_schedule(pdf: UploadFile) -> Eng10Schedule:
-    return Eng10Schedule.from_pdf_bytes(await pdf.read())
