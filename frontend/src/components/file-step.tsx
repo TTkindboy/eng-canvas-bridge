@@ -1,9 +1,11 @@
 import useSWR from "swr"
-import { ArrowLeft, Calendar } from "lucide-react"
+import { ArrowLeft, Calendar, Upload } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
 import { SelectableItem } from "@/components/selectable-item"
 import { fetchCourseFiles, type FileOption } from "@/lib/api"
 import { isSchedule } from "@/lib/highlighting"
+import { useCallback } from "react"
+import { useDropzone } from "react-dropzone"
 
 interface FileStepProps {
   courseId: string
@@ -22,6 +24,18 @@ export function FileStep({ courseId, courseName, onFileSelect, onBack }: FileSte
 
   const visiblePdfs = pdfs?.filter(f => isSchedule(f.title))
 
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    const file = acceptedFiles[0]
+    if (!file) return
+    console.log("Dropped file:", file)
+  }, [])
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    noClick: true,
+    accept: { "application/pdf": [".pdf"] }, // add docx later with 11th grade support
+  })
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
@@ -30,7 +44,7 @@ export function FileStep({ courseId, courseName, onFileSelect, onBack }: FileSte
           Step 2 of 3
         </div>
         <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">
-          Select a schedule
+          Select or drop a schedule
         </h1>
         <button
           onClick={onBack}
@@ -41,7 +55,8 @@ export function FileStep({ courseId, courseName, onFileSelect, onBack }: FileSte
         </button>
       </div>
 
-      <div className="flex flex-col gap-1">
+      <div {...getRootProps()} className="relative flex flex-col gap-1">
+        <input {...getInputProps()} />
         {isLoading && (
           <div className="flex items-center gap-3 py-6 text-muted-foreground text-sm">
             <Spinner className="size-4" />
@@ -63,6 +78,12 @@ export function FileStep({ courseId, courseName, onFileSelect, onBack }: FileSte
             onClick={() => onFileSelect(pdf.id, pdf.title)}
           />
         ))}
+        {isDragActive && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-primary bg-primary/5 backdrop-blur-[1px]">
+            <Upload className="size-5 text-primary" />
+            <span className="text-sm font-medium text-primary">Drop PDF here</span>
+          </div>
+        )}
       </div>
     </div>
   )
