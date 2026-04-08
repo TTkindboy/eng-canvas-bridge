@@ -55,8 +55,8 @@ pass_filenames = false
 files = '^backend'
 
 [[repos.hooks]]
-id = "local-eslint"
-name = "ESLint"
+id = "local-oxlint"
+name = "Oxlint"
 language = "system"
 entry = "pnpm --dir frontend run lint"
 pass_filenames = false

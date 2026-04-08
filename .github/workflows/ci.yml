@@ -61,5 +61,5 @@ jobs:
       - name: TypeScript type check
         run: pnpm tsc -b --noEmit
 
-      - name: Lint with ESLint
+      - name: Lint with oxlint
         run: pnpm run lint

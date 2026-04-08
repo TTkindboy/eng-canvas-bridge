@@ -1,5 +1,5 @@
 import useSWR from "swr"
-import { ArrowLeft, FileText, Calendar } from "lucide-react"
+import { ArrowLeft, Calendar } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
 import { SelectableItem } from "@/components/selectable-item"
 import { fetchCourseFiles, type FileOption } from "@/lib/api"
@@ -52,12 +52,12 @@ export function FileStep({ courseId, courseName, onFileSelect, onBack }: FileSte
           <p className="text-destructive text-sm">Failed to load files.</p>
         )}
         {!isLoading && visiblePdfs?.length === 0 && (
-          <p className="text-muted-foreground text-sm py-4">No files found for this course.</p>
+          <p className="text-muted-foreground text-sm py-4">No schedules found for this course.</p>
         )}
         {visiblePdfs?.map((pdf, index) => (
           <SelectableItem
             key={pdf.id}
-            icon={isSchedule(pdf.title) ? Calendar : FileText}
+            icon={Calendar}
             label={pdf.title}
             highlighted={index === 0}
             onClick={() => onFileSelect(pdf.id, pdf.title)}
