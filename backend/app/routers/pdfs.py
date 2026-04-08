@@ -2,7 +2,7 @@ from __future__ import annotations
 import asyncio
 from typing import Literal
 
-from fastapi import APIRouter
+from fastapi import APIRouter, UploadFile
 
 from ..dependencies import HTTPClient, canvas_auth, get_settings
 from ..parsers.eng10 import Eng10Schedule
@@ -43,3 +43,7 @@ async def add_planner_note(client: HTTPClient, note: PlannerNote) -> PlannerNote
     )
     resp.raise_for_status()
     return PlannerNote.model_validate(resp.json())
+
+@router.post("/upload", description="Preview schedule from PDF upload")
+async def preview_uploaded_schedule(pdf: UploadFile) -> Eng10Schedule:
+    return Eng10Schedule.from_pdf_bytes(await pdf.read())

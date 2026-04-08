@@ -5,6 +5,16 @@ export type ClientOptions = {
 };
 
 /**
+ * Body_preview_uploaded_schedule
+ */
+export type BodyPreviewUploadedSchedule = {
+    /**
+     * Pdf
+     */
+    pdf: Blob | File;
+};
+
+/**
  * BulkDeleteResult
  */
 export type BulkDeleteResult = {
@@ -211,6 +221,31 @@ export type ParsePdfToPlannerResponses = {
 };
 
 export type ParsePdfToPlannerResponse = ParsePdfToPlannerResponses[keyof ParsePdfToPlannerResponses];
+
+export type PreviewUploadedScheduleData = {
+    body: BodyPreviewUploadedSchedule;
+    path?: never;
+    query?: never;
+    url: '/pdfs/upload';
+};
+
+export type PreviewUploadedScheduleErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type PreviewUploadedScheduleError = PreviewUploadedScheduleErrors[keyof PreviewUploadedScheduleErrors];
+
+export type PreviewUploadedScheduleResponses = {
+    /**
+     * Successful Response
+     */
+    200: Eng10Schedule;
+};
+
+export type PreviewUploadedScheduleResponse = PreviewUploadedScheduleResponses[keyof PreviewUploadedScheduleResponses];
 
 export type GetCoursesData = {
     body?: never;
