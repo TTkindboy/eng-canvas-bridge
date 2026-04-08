@@ -114,7 +114,7 @@ function SegmentedTabs({
               "flex flex-1 items-center justify-center gap-2 py-2 text-sm font-medium transition-all duration-150",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
               active
-                ? "bg-foreground text-background"
+                ? "bg-primary text-primary-foreground"
                 : "bg-card text-muted-foreground hover:bg-accent hover:text-foreground",
               tab === "even" && "border-l border-border",
             )}
@@ -123,7 +123,7 @@ function SegmentedTabs({
             <span
               className={cn(
                 "flex items-center justify-center rounded-full w-4 h-4 text-[10px] font-bold tabular-nums transition-colors",
-                active ? "bg-background/20 text-background" : "bg-muted text-muted-foreground",
+                active ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground",
               )}
             >
               {count}
@@ -174,7 +174,7 @@ export function SchedulePreviewStep({
       {/* Header */}
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2 text-muted-foreground text-sm font-medium tracking-wide uppercase">
-          <span className="flex size-5 items-center justify-center rounded-full bg-foreground text-background text-xs font-bold">
+          <span className="flex size-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">
             3
           </span>
           Step 3 of 3

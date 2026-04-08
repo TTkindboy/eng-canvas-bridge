@@ -55,6 +55,14 @@ pass_filenames = false
 files = '^backend'
 
 [[repos.hooks]]
+id = "local-oxlint"
+name = "Oxlint"
+language = "system"
+entry = "pnpm --dir frontend run lint"
+pass_filenames = false
+files = '^frontend/src/'
+
+[[repos.hooks]]
 id = "generate-api-client" # maybe migrate to toml 1.1 in the future
 name = "Generate API client"
 language = "system"
