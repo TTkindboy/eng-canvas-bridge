@@ -92,11 +92,12 @@ export function FileStep({ courseId, courseName, onFileSelect, onBack }: FileSte
             wrapperClassName="absolute inset-0 z-10"
             wrapperStyle={{ position: "absolute", display: "block" }}
             innerStyle={{ width: "100%", height: "100%" }}
-            magnetStrength={5}
+            magnetStrength={10}
+            padding={300}
           >
-            <div className="flex h-full w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-primary bg-primary/10">
-              <Upload className="size-5 text-primary" />
-              <span className="text-sm font-medium text-primary">Drop PDF here</span>
+            <div className={`flex h-full w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed bg-background/80 ${isDragActive ? "border-primary" : "border-border"}`}> {/* I hate the new background but it looks weird otherwise*/}
+              <Upload className={`size-5 ${isDragActive ? "text-primary" : "text-muted-foreground"}`} />
+              <span className={`text-sm font-medium ${isDragActive ? "text-primary" : "text-muted-foreground"}`}>Drop PDF here</span>
             </div>
           </Magnet>
         )}
