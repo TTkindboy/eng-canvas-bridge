@@ -1,6 +1,7 @@
 import useSWR from "swr"
 import { ArrowLeft, Calendar, Upload } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
+import Magnet from "@/components/ui/magnet"
 import { SelectableItem } from "@/components/selectable-item"
 import { fetchCourseFiles, type FileOption } from "@/lib/api"
 import { isSchedule } from "@/lib/highlighting"
@@ -30,11 +31,13 @@ export function FileStep({ courseId, courseName, onFileSelect, onBack }: FileSte
     console.log("Dropped file:", file)
   }, [])
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive, isDragGlobal } = useDropzone({
     onDrop,
     noClick: true,
     accept: { "application/pdf": [".pdf"] }, // add docx later with 11th grade support
   })
+
+  const showDropOverlay = isDragGlobal || isDragActive
 
   return (
     <div className="flex flex-col gap-6">
@@ -55,34 +58,47 @@ export function FileStep({ courseId, courseName, onFileSelect, onBack }: FileSte
         </button>
       </div>
 
-      <div {...getRootProps()} className="relative flex flex-col gap-1">
+      <div {...getRootProps()} className="relative flex min-h-64 flex-col gap-1">
         <input {...getInputProps()} />
-        {isLoading && (
-          <div className="flex items-center gap-3 py-6 text-muted-foreground text-sm">
-            <Spinner className="size-4" />
-            Loading files...
-          </div>
-        )}
-        {error && (
-          <p className="text-destructive text-sm">Failed to load files.</p>
-        )}
-        {!isLoading && visiblePdfs?.length === 0 && (
-          <p className="text-muted-foreground text-sm py-4">No schedules found for this course.</p>
-        )}
-        {visiblePdfs?.map((pdf, index) => (
-          <SelectableItem
-            key={pdf.id}
-            icon={Calendar}
-            label={pdf.title}
-            highlighted={index === 0}
-            onClick={() => onFileSelect(pdf.id, pdf.title)}
-          />
-        ))}
-        {isDragActive && (
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-primary bg-primary/5 backdrop-blur-[1px]">
-            <Upload className="size-5 text-primary" />
-            <span className="text-sm font-medium text-primary">Drop PDF here</span>
-          </div>
+        <div
+          className={`flex flex-col gap-1 transition-opacity duration-200 ${
+            showDropOverlay ? "opacity-25" : "opacity-100"
+          }`}
+        >
+          {isLoading && (
+            <div className="flex items-center gap-3 py-6 text-muted-foreground text-sm">
+              <Spinner className="size-4" />
+              Loading files...
+            </div>
+          )}
+          {error && (
+            <p className="text-destructive text-sm">Failed to load files.</p>
+          )}
+          {!isLoading && visiblePdfs?.length === 0 && (
+            <p className="text-muted-foreground text-sm py-4">No schedules found for this course.</p>
+          )}
+          {visiblePdfs?.map((pdf, index) => (
+            <SelectableItem
+              key={pdf.id}
+              icon={Calendar}
+              label={pdf.title}
+              highlighted={index === 0}
+              onClick={() => onFileSelect(pdf.id, pdf.title)}
+            />
+          ))}
+        </div>
+        {showDropOverlay && (
+          <Magnet
+            wrapperClassName="absolute inset-0 z-10"
+            wrapperStyle={{ position: "absolute", display: "block" }}
+            innerStyle={{ width: "100%", height: "100%" }}
+            magnetStrength={5}
+          >
+            <div className="flex h-full w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-primary bg-primary/10">
+              <Upload className="size-5 text-primary" />
+              <span className="text-sm font-medium text-primary">Drop PDF here</span>
+            </div>
+          </Magnet>
         )}
       </div>
     </div>
