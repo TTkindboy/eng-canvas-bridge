@@ -1,12 +1,13 @@
 from __future__ import annotations
-import asyncio
-from typing import Literal
 
-from fastapi import APIRouter, UploadFile
+import asyncio
+from typing import Annotated, Literal
+
+from fastapi import APIRouter, HTTPException, Query, UploadFile
 
 from ..dependencies import HTTPClient, canvas_auth, get_settings
-from ..parsers.eng10 import Eng10Schedule
 from ..parsers.base import PlannerNote
+from ..parsers.eng10 import Eng10Schedule
 
 router = APIRouter(prefix="/pdfs")
 
@@ -25,18 +26,14 @@ async def preview_uploaded_schedule(pdf: UploadFile) -> Eng10Schedule:
     return Eng10Schedule.from_pdf_bytes(await pdf.read())
 
 
-@router.post("/{file_id}", summary="Parse PDF and add to planner")
-async def parse_pdf_to_planner(client: HTTPClient, file_id: int, day: Literal["odd", "even"], course_id: int | None = None) -> list[PlannerNote]:
-    # DUPLICATED CODE with preview_schedule, maybe refactor later or add session caching
-    pdf_resp = await client.get(
-        f"{get_settings().site_url}/files/{file_id}/download", # override baseurl bc no /api/v1
-        headers=canvas_auth(),
-        follow_redirects=True,
-    )
-    pdf_resp.raise_for_status()
-
-    schedule = Eng10Schedule.from_pdf_bytes(pdf_resp.content, course_id=course_id)
-    return await asyncio.gather(*(add_planner_note(client, note) for note in getattr(schedule, day + "_days"))) # maybe add helper function in main.py for this
+@router.post("/add", summary="Add Canvas PlannerNotes from parsed schedule")
+async def add_schedule_to_planner(client: HTTPClient, schedule: Eng10Schedule, day: Literal["odd", "even"], course_id: Annotated[int | None, Query(description="Canvas course ID, fails if already set on input schedule")] | None = None) -> list[PlannerNote]:
+    notes = getattr(schedule, day + "_days")
+    for note in notes:
+        if None not in (course_id, note.course_id) and note.course_id != course_id:
+            raise HTTPException(status_code=422, detail=f"Note {note.id} belongs to course {note.course_id}, not {course_id}")
+        note.course_id = course_id
+    return await asyncio.gather(*(add_planner_note(client, note) for note in notes))  # TODO: Add semaphore
 
 
 async def add_planner_note(client: HTTPClient, note: PlannerNote) -> PlannerNote: # TODO: return status

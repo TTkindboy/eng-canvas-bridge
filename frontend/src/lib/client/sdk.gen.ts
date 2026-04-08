@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { DeleteNotesData, DeleteNotesErrors, DeleteNotesResponses, GetCoursesData, GetCoursesErrors, GetCoursesResponses, GetPdfsData, GetPdfsErrors, GetPdfsResponses, ParsePdfToPlannerData, ParsePdfToPlannerErrors, ParsePdfToPlannerResponses, PreviewScheduleData, PreviewScheduleErrors, PreviewScheduleResponses, PreviewUploadedScheduleData, PreviewUploadedScheduleErrors, PreviewUploadedScheduleResponses } from './types.gen';
+import type { AddScheduleToPlannerData, AddScheduleToPlannerErrors, AddScheduleToPlannerResponses, DeleteNotesData, DeleteNotesErrors, DeleteNotesResponses, GetCoursesData, GetCoursesErrors, GetCoursesResponses, GetPdfsData, GetPdfsErrors, GetPdfsResponses, PreviewScheduleData, PreviewScheduleErrors, PreviewScheduleResponses, PreviewUploadedScheduleData, PreviewUploadedScheduleErrors, PreviewUploadedScheduleResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -24,11 +24,6 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 export const previewSchedule = <ThrowOnError extends boolean = false>(options: Options<PreviewScheduleData, ThrowOnError>) => (options.client ?? client).get<PreviewScheduleResponses, PreviewScheduleErrors, ThrowOnError>({ url: '/pdfs/{file_id}', ...options });
 
 /**
- * Parse PDF and add to planner
- */
-export const parsePdfToPlanner = <ThrowOnError extends boolean = false>(options: Options<ParsePdfToPlannerData, ThrowOnError>) => (options.client ?? client).post<ParsePdfToPlannerResponses, ParsePdfToPlannerErrors, ThrowOnError>({ url: '/pdfs/{file_id}', ...options });
-
-/**
  * Preview Uploaded Schedule
  *
  * Preview schedule from PDF upload
@@ -39,6 +34,18 @@ export const previewUploadedSchedule = <ThrowOnError extends boolean = false>(op
     ...options,
     headers: {
         'Content-Type': null,
+        ...options.headers
+    }
+});
+
+/**
+ * Add Canvas PlannerNotes from parsed schedule
+ */
+export const addScheduleToPlanner = <ThrowOnError extends boolean = false>(options: Options<AddScheduleToPlannerData, ThrowOnError>) => (options.client ?? client).post<AddScheduleToPlannerResponses, AddScheduleToPlannerErrors, ThrowOnError>({
+    url: '/pdfs/add',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
         ...options.headers
     }
 });

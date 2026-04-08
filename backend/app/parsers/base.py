@@ -6,7 +6,7 @@ from math import inf
 from typing import Annotated, Any
 
 import pymupdf
-from pydantic import BaseModel, BeforeValidator, Field, RootModel
+from pydantic import BaseModel, BeforeValidator, Field, RootModel, ConfigDict
 
 
 def _parse_date(v: Any) -> date:
@@ -77,8 +77,10 @@ class BaseSchedule(ABC):
         ...
 
 class DualSchedule(BaseModel, BaseSchedule, ABC):
-    odd_days: list[PlannerNote] = Field(serialization_alias="odd")
-    even_days: list[PlannerNote] = Field(serialization_alias="even")
+    model_config = ConfigDict(validate_by_name=True, json_schema_mode_override='validation')
+
+    odd_days: Annotated[list[PlannerNote], Field(alias="odd")]
+    even_days: Annotated[list[PlannerNote], Field(alias="even")]
 
 class SingleSchedule(RootModel[list[PlannerNote]], BaseSchedule, ABC):
     ...

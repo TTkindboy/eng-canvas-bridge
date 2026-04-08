@@ -181,47 +181,6 @@ export type PreviewScheduleResponses = {
 
 export type PreviewScheduleResponse = PreviewScheduleResponses[keyof PreviewScheduleResponses];
 
-export type ParsePdfToPlannerData = {
-    body?: never;
-    path: {
-        /**
-         * File Id
-         */
-        file_id: number;
-    };
-    query: {
-        /**
-         * Day
-         */
-        day: 'odd' | 'even';
-        /**
-         * Course Id
-         */
-        course_id?: number | null;
-    };
-    url: '/pdfs/{file_id}';
-};
-
-export type ParsePdfToPlannerErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type ParsePdfToPlannerError = ParsePdfToPlannerErrors[keyof ParsePdfToPlannerErrors];
-
-export type ParsePdfToPlannerResponses = {
-    /**
-     * Response Parse Pdf To Planner
-     *
-     * Successful Response
-     */
-    200: Array<PlannerNote>;
-};
-
-export type ParsePdfToPlannerResponse = ParsePdfToPlannerResponses[keyof ParsePdfToPlannerResponses];
-
 export type PreviewUploadedScheduleData = {
     body: BodyPreviewUploadedSchedule;
     path?: never;
@@ -246,6 +205,42 @@ export type PreviewUploadedScheduleResponses = {
 };
 
 export type PreviewUploadedScheduleResponse = PreviewUploadedScheduleResponses[keyof PreviewUploadedScheduleResponses];
+
+export type AddScheduleToPlannerData = {
+    body: Eng10Schedule;
+    path?: never;
+    query: {
+        /**
+         * Day
+         */
+        day: 'odd' | 'even';
+        /**
+         * Course Id
+         */
+        course_id?: number | null | null;
+    };
+    url: '/pdfs/add';
+};
+
+export type AddScheduleToPlannerErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type AddScheduleToPlannerError = AddScheduleToPlannerErrors[keyof AddScheduleToPlannerErrors];
+
+export type AddScheduleToPlannerResponses = {
+    /**
+     * Response Add Schedule To Planner
+     *
+     * Successful Response
+     */
+    200: Array<PlannerNote>;
+};
+
+export type AddScheduleToPlannerResponse = AddScheduleToPlannerResponses[keyof AddScheduleToPlannerResponses];
 
 export type GetCoursesData = {
     body?: never;

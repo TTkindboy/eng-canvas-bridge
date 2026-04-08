@@ -1,5 +1,5 @@
 import { client } from '@/lib/client/client.gen'
-import { getCourses, getPdfs, previewSchedule, previewUploadedSchedule, parsePdfToPlanner } from '@/lib/client'
+import { getCourses, getPdfs, previewSchedule, previewUploadedSchedule, addScheduleToPlanner } from '@/lib/client'
 import type { Course, CourseFile, Eng10Schedule, PlannerNote } from '@/lib/client'
 
 client.setConfig({
@@ -74,7 +74,7 @@ export async function addToPlannerNotes(
   day: 'odd' | 'even',
   courseId?: number,
 ): Promise<PlannerNote[]> {
-  const { data } = await parsePdfToPlanner({
+  const { data } = await addScheduleToPlanner({
     path: { file_id: Number(fileId) },
     query: { day, course_id: courseId ?? null },
     throwOnError: true,
