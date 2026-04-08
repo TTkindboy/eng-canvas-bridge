@@ -3,13 +3,12 @@ import useSWR from "swr"
 import { ArrowLeft, CalendarPlus, CheckCircle2 } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
 import { Button } from "@/components/ui/button"
-import { fetchSchedulePreview, addToPlannerNotes } from "@/lib/api"
+import { fetchSchedulePreview, addToPlannerNotes, type SelectedFile } from "@/lib/api"
 import type { PlannerNote, Eng10Schedule } from "@/lib/client"
 import { cn } from "@/lib/utils"
 
 interface SchedulePreviewStepProps {
-  fileId: string
-  fileTitle: string
+  selectedFile: SelectedFile
   courseId: string
   courseName: string
   onBack: () => void
@@ -136,8 +135,7 @@ function SegmentedTabs({
 }
 
 export function SchedulePreviewStep({
-  fileId,
-  fileTitle,
+  selectedFile,
   courseId,
   onBack,
 }: SchedulePreviewStepProps) {
@@ -145,13 +143,15 @@ export function SchedulePreviewStep({
   const [adding, setAdding] = useState<"odd" | "even" | null>(null)
   const [added, setAdded] = useState<Set<"odd" | "even">>(new Set())
   const [addError, setAddError] = useState<string | null>(null)
+  const fileId = selectedFile.source === "canvas" ? selectedFile.id : undefined
 
   const { data: schedule, error, isLoading } = useSWR<Eng10Schedule>(
-    ["schedule-preview", fileId],
+    fileId ? (["schedule-preview", fileId] as const) : null,
     ([, id]: [string, string]) => fetchSchedulePreview(id),
   )
 
   const handleAdd = async (day: "odd" | "even") => {
+    if (!fileId) return
     setAdding(day)
     setAddError(null)
     try {
@@ -167,7 +167,7 @@ export function SchedulePreviewStep({
   const activeNotes: PlannerNote[] = schedule ? schedule[activeTab] : []
   const isDone = added.has(activeTab)
   const isAddingActive = adding === activeTab
-  const isDisabled = isAddingActive || isDone || adding !== null
+  const isDisabled = !fileId || isAddingActive || isDone || adding !== null
 
   return (
     <div className="flex flex-col gap-6">
@@ -187,7 +187,7 @@ export function SchedulePreviewStep({
           className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors w-fit mt-0.5"
         >
           <ArrowLeft className="size-3.5" />
-          <span className="truncate max-w-[220px]">{fileTitle}</span>
+          <span className="truncate max-w-[220px]">{selectedFile.title}</span>
         </button>
       </div>
 
@@ -205,6 +205,10 @@ export function SchedulePreviewStep({
       {/* Error */}
       {error && (
         <p className="text-destructive text-sm">Failed to load schedule preview.</p>
+      )}
+
+      {!fileId && (
+        <p className="text-muted-foreground text-sm">Uploaded files are not wired into preview yet.</p>
       )}
 
       {/* Content */}

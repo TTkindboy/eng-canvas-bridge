@@ -17,6 +17,18 @@ export interface FileOption {
   title: string
 }
 
+export type SelectedFile =
+  | {
+      source: 'canvas'
+      id: string
+      title: string
+    }
+  | {
+      source: 'upload'
+      title: string
+      file: File
+    }
+
 export async function fetchCourses(): Promise<CourseOption[]> {
   const { data } = await getCourses({ throwOnError: true })
   return data

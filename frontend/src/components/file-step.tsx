@@ -3,7 +3,7 @@ import { ArrowLeft, Calendar, Upload } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
 import Magnet from "@/components/ui/magnet"
 import { SelectableItem } from "@/components/selectable-item"
-import { fetchCourseFiles, type FileOption } from "@/lib/api"
+import { fetchCourseFiles, type FileOption, type SelectedFile } from "@/lib/api"
 import { isSchedule } from "@/lib/highlighting"
 import { useCallback } from "react"
 import { useDropzone } from "react-dropzone"
@@ -11,7 +11,7 @@ import { useDropzone } from "react-dropzone"
 interface FileStepProps {
   courseId: string
   courseName: string
-  onFileSelect: (id: string, title: string) => void
+  onFileSelect: (file: SelectedFile) => void
   onBack: () => void
 }
 
@@ -28,8 +28,12 @@ export function FileStep({ courseId, courseName, onFileSelect, onBack }: FileSte
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0]
     if (!file) return
-    console.log("Dropped file:", file)
-  }, [])
+    onFileSelect({
+      source: "upload",
+      title: file.name,
+      file,
+    })
+  }, [onFileSelect])
 
   const { getRootProps, getInputProps, isDragActive, isDragGlobal } = useDropzone({
     onDrop,
@@ -83,7 +87,13 @@ export function FileStep({ courseId, courseName, onFileSelect, onBack }: FileSte
               icon={Calendar}
               label={pdf.title}
               highlighted={index === 0}
-              onClick={() => onFileSelect(pdf.id, pdf.title)}
+              onClick={() =>
+                onFileSelect({
+                  source: "canvas",
+                  id: pdf.id,
+                  title: pdf.title,
+                })
+              }
             />
           ))}
         </div>
