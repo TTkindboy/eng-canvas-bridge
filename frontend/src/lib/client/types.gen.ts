@@ -5,6 +5,16 @@ export type ClientOptions = {
 };
 
 /**
+ * Body_preview_uploaded_schedule
+ */
+export type BodyPreviewUploadedSchedule = {
+    /**
+     * Pdf
+     */
+    pdf: Blob | File;
+};
+
+/**
  * BulkDeleteResult
  */
 export type BulkDeleteResult = {
@@ -171,14 +181,34 @@ export type PreviewScheduleResponses = {
 
 export type PreviewScheduleResponse = PreviewScheduleResponses[keyof PreviewScheduleResponses];
 
-export type ParsePdfToPlannerData = {
-    body?: never;
-    path: {
-        /**
-         * File Id
-         */
-        file_id: number;
-    };
+export type PreviewUploadedScheduleData = {
+    body: BodyPreviewUploadedSchedule;
+    path?: never;
+    query?: never;
+    url: '/pdfs/upload';
+};
+
+export type PreviewUploadedScheduleErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type PreviewUploadedScheduleError = PreviewUploadedScheduleErrors[keyof PreviewUploadedScheduleErrors];
+
+export type PreviewUploadedScheduleResponses = {
+    /**
+     * Successful Response
+     */
+    200: Eng10Schedule;
+};
+
+export type PreviewUploadedScheduleResponse = PreviewUploadedScheduleResponses[keyof PreviewUploadedScheduleResponses];
+
+export type AddScheduleToCanvasData = {
+    body: Eng10Schedule;
+    path?: never;
     query: {
         /**
          * Day
@@ -186,31 +216,33 @@ export type ParsePdfToPlannerData = {
         day: 'odd' | 'even';
         /**
          * Course Id
+         *
+         * Canvas course ID, fails if already set on input schedule
          */
         course_id?: number | null;
     };
-    url: '/pdfs/{file_id}';
+    url: '/pdfs/add';
 };
 
-export type ParsePdfToPlannerErrors = {
+export type AddScheduleToCanvasErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type ParsePdfToPlannerError = ParsePdfToPlannerErrors[keyof ParsePdfToPlannerErrors];
+export type AddScheduleToCanvasError = AddScheduleToCanvasErrors[keyof AddScheduleToCanvasErrors];
 
-export type ParsePdfToPlannerResponses = {
+export type AddScheduleToCanvasResponses = {
     /**
-     * Response Parse Pdf To Planner
+     * Response Add Schedule To Canvas
      *
      * Successful Response
      */
     200: Array<PlannerNote>;
 };
 
-export type ParsePdfToPlannerResponse = ParsePdfToPlannerResponses[keyof ParsePdfToPlannerResponses];
+export type AddScheduleToCanvasResponse = AddScheduleToCanvasResponses[keyof AddScheduleToCanvasResponses];
 
 export type GetCoursesData = {
     body?: never;

@@ -1,14 +1,17 @@
 import useSWR from "swr"
-import { ArrowLeft, Calendar } from "lucide-react"
+import { ArrowLeft, Calendar, Upload } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
+import Magnet from "@/components/ui/magnet"
 import { SelectableItem } from "@/components/selectable-item"
-import { fetchCourseFiles, type FileOption } from "@/lib/api"
+import { fetchCourseFiles, type FileOption, type SelectedFile } from "@/lib/api"
 import { isSchedule } from "@/lib/highlighting"
+import { useCallback } from "react"
+import { useDropzone } from "react-dropzone"
 
 interface FileStepProps {
   courseId: string
   courseName: string
-  onFileSelect: (id: string, title: string) => void
+  onFileSelect: (file: SelectedFile) => void
   onBack: () => void
 }
 
@@ -22,6 +25,24 @@ export function FileStep({ courseId, courseName, onFileSelect, onBack }: FileSte
 
   const visiblePdfs = pdfs?.filter(f => isSchedule(f.title))
 
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    const file = acceptedFiles[0]
+    if (!file) return
+    onFileSelect({
+      source: "upload",
+      title: file.name,
+      file,
+    })
+  }, [onFileSelect])
+
+  const { getRootProps, getInputProps, isDragActive, isDragGlobal } = useDropzone({
+    onDrop,
+    noClick: true,
+    accept: { "application/pdf": [".pdf"] }, // add docx later with 11th grade support
+  })
+
+  const showDropOverlay = isDragGlobal || isDragActive
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
@@ -30,7 +51,7 @@ export function FileStep({ courseId, courseName, onFileSelect, onBack }: FileSte
           Step 2 of 3
         </div>
         <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">
-          Select a schedule
+          Select or drop a schedule
         </h1>
         <button
           onClick={onBack}
@@ -41,28 +62,55 @@ export function FileStep({ courseId, courseName, onFileSelect, onBack }: FileSte
         </button>
       </div>
 
-      <div className="flex flex-col gap-1">
-        {isLoading && (
-          <div className="flex items-center gap-3 py-6 text-muted-foreground text-sm">
-            <Spinner className="size-4" />
-            Loading files...
-          </div>
+      <div {...getRootProps()} className="relative flex min-h-64 flex-col gap-1">
+        <input {...getInputProps()} />
+        <div
+          className={`flex flex-col gap-1 transition-opacity duration-200 ${
+            showDropOverlay ? "opacity-25" : "opacity-100"
+          }`}
+        >
+          {isLoading && (
+            <div className="flex items-center gap-3 py-6 text-muted-foreground text-sm">
+              <Spinner className="size-4" />
+              Loading files...
+            </div>
+          )}
+          {error && (
+            <p className="text-destructive text-sm">Failed to load files.</p>
+          )}
+          {!isLoading && visiblePdfs?.length === 0 && (
+            <p className="text-muted-foreground text-sm py-4">No schedules found for this course.</p>
+          )}
+          {visiblePdfs?.map((pdf, index) => (
+            <SelectableItem
+              key={pdf.id}
+              icon={Calendar}
+              label={pdf.title}
+              highlighted={index === 0}
+              onClick={() =>
+                onFileSelect({
+                  source: "canvas",
+                  id: pdf.id,
+                  title: pdf.title,
+                })
+              }
+            />
+          ))}
+        </div>
+        {showDropOverlay && (
+          <Magnet
+            wrapperClassName="absolute inset-0 z-10"
+            wrapperStyle={{ position: "absolute", display: "block" }}
+            innerStyle={{ width: "100%", height: "100%" }}
+            magnetStrength={10}
+            padding={300}
+          >
+            <div className={`flex h-full w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed bg-background/80 ${isDragActive ? "border-primary" : "border-border"}`}> {/* I hate the new background but it looks weird otherwise*/}
+              <Upload className={`size-5 ${isDragActive ? "text-primary" : "text-muted-foreground"}`} />
+              <span className={`text-sm font-medium ${isDragActive ? "text-primary" : "text-muted-foreground"}`}>Drop PDF here</span>
+            </div>
+          </Magnet>
         )}
-        {error && (
-          <p className="text-destructive text-sm">Failed to load files.</p>
-        )}
-        {!isLoading && visiblePdfs?.length === 0 && (
-          <p className="text-muted-foreground text-sm py-4">No schedules found for this course.</p>
-        )}
-        {visiblePdfs?.map((pdf, index) => (
-          <SelectableItem
-            key={pdf.id}
-            icon={Calendar}
-            label={pdf.title}
-            highlighted={index === 0}
-            onClick={() => onFileSelect(pdf.id, pdf.title)}
-          />
-        ))}
       </div>
     </div>
   )

@@ -2,18 +2,19 @@ import { useState } from "react"
 import { CourseStep } from "@/components/course-step"
 import { FileStep } from "@/components/file-step"
 import { SchedulePreviewStep } from "@/components/schedule-preview-step"
+import type { SelectedFile } from "@/lib/api"
 
 export default function App() {
   const [selectedCourse, setSelectedCourse] = useState<{ id: string; name: string } | undefined>()
-  const [selectedFile, setSelectedFile] = useState<{ id: string; title: string } | undefined>()
+  const [selectedFile, setSelectedFile] = useState<SelectedFile | undefined>()
 
   const handleCourseSelect = (id: string, name: string) => {
     setSelectedCourse({ id, name })
     setSelectedFile(undefined)
   }
 
-  const handleFileSelect = (id: string, title: string) => {
-    setSelectedFile({ id, title })
+  const handleFileSelect = (file: SelectedFile) => {
+    setSelectedFile(file)
   }
 
   const handleBackToCourses = () => {
@@ -39,10 +40,8 @@ export default function App() {
           />
         ) : (
           <SchedulePreviewStep
-            fileId={selectedFile.id}
-            fileTitle={selectedFile.title}
+            selectedFile={selectedFile}
             courseId={selectedCourse.id}
-            courseName={selectedCourse.name}
             onBack={handleBackToFiles}
           />
         )}

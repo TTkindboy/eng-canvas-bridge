@@ -37,7 +37,11 @@ class Eng10Schedule(DualSchedule, TextPdfMixin):
             if line.strip() and "NO CLASS" not in line # this seems really fragile and dangerous but i'm too lazy to make it better rn
         )
         return [
-            PlannerNote(todo_date=nearest_matching_date(int(month), int(day), weekday), title=assignment, course_id=course_id) # TODO: COMPLETE Parameters
+            PlannerNote(
+                todo_date=nearest_matching_date(int(month), int(day), weekday),
+                title=assignment,
+                course_id=course_id
+            ) # TODO: COMPLETE Parameters
             for weekday, month, day, assignment
             in matches
         ]

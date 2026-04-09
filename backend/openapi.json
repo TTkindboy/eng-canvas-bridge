@@ -42,20 +42,52 @@
             }
           }
         }
-      },
+      }
+    },
+    "/pdfs/upload": {
       "post": {
-        "summary": "Parse PDF and add to planner",
-        "operationId": "parse_pdf_to_planner",
-        "parameters": [
-          {
-            "name": "file_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "File Id"
+        "summary": "Preview Uploaded Schedule",
+        "description": "Preview schedule from PDF upload",
+        "operationId": "preview_uploaded_schedule",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_preview_uploaded_schedule"
+              }
             }
           },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Eng10Schedule"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pdfs/add": {
+      "post": {
+        "summary": "Add Canvas PlannerNotes from parsed schedule",
+        "operationId": "add_schedule_to_canvas",
+        "parameters": [
           {
             "name": "day",
             "in": "query",
@@ -82,10 +114,22 @@
                   "type": "null"
                 }
               ],
+              "description": "Canvas course ID, fails if already set on input schedule",
               "title": "Course Id"
-            }
+            },
+            "description": "Canvas course ID, fails if already set on input schedule"
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Eng10Schedule"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -96,7 +140,7 @@
                   "items": {
                     "$ref": "#/components/schemas/PlannerNote"
                   },
-                  "title": "Response Parse Pdf To Planner"
+                  "title": "Response Add Schedule To Canvas"
                 }
               }
             }
@@ -243,6 +287,20 @@
   },
   "components": {
     "schemas": {
+      "Body_preview_uploaded_schedule": {
+        "properties": {
+          "pdf": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "Pdf"
+          }
+        },
+        "type": "object",
+        "required": [
+          "pdf"
+        ],
+        "title": "Body_preview_uploaded_schedule"
+      },
       "BulkDeleteResult": {
         "properties": {
           "total": {

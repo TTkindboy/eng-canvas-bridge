@@ -3,15 +3,13 @@ import useSWR from "swr"
 import { ArrowLeft, CalendarPlus, CheckCircle2 } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
 import { Button } from "@/components/ui/button"
-import { fetchSchedulePreview, addToPlannerNotes } from "@/lib/api"
+import { fetchSchedulePreview, addScheduleToCanvas, type SelectedFile } from "@/lib/api"
 import type { PlannerNote, Eng10Schedule } from "@/lib/client"
 import { cn } from "@/lib/utils"
 
 interface SchedulePreviewStepProps {
-  fileId: string
-  fileTitle: string
+  selectedFile: SelectedFile
   courseId: string
-  courseName: string
   onBack: () => void
 }
 
@@ -136,8 +134,7 @@ function SegmentedTabs({
 }
 
 export function SchedulePreviewStep({
-  fileId,
-  fileTitle,
+  selectedFile,
   courseId,
   onBack,
 }: SchedulePreviewStepProps) {
@@ -145,17 +142,32 @@ export function SchedulePreviewStep({
   const [adding, setAdding] = useState<"odd" | "even" | null>(null)
   const [added, setAdded] = useState<Set<"odd" | "even">>(new Set())
   const [addError, setAddError] = useState<string | null>(null)
+  const previewKey =
+    selectedFile.source === "canvas"
+      ? (["schedule-preview", "canvas", selectedFile.id] as const)
+      : ([
+          "schedule-preview",
+          "upload",
+          selectedFile.title,
+          selectedFile.file.name,
+          selectedFile.file.size,
+          selectedFile.file.lastModified,
+        ] as const)
 
   const { data: schedule, error, isLoading } = useSWR<Eng10Schedule>(
-    ["schedule-preview", fileId],
-    ([, id]: [string, string]) => fetchSchedulePreview(id),
+    previewKey,
+    () => fetchSchedulePreview(selectedFile),
   )
 
   const handleAdd = async (day: "odd" | "even") => {
     setAdding(day)
     setAddError(null)
     try {
-      await addToPlannerNotes(fileId, day, Number(courseId))
+      await addScheduleToCanvas({
+        body: schedule!,
+        query: { day, course_id: Number(courseId) },
+        throwOnError: true,
+      })
       setAdded((prev) => new Set([...prev, day]))
     } catch {
       setAddError(`Failed to add ${day} days to planner.`)
@@ -187,7 +199,7 @@ export function SchedulePreviewStep({
           className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors w-fit mt-0.5"
         >
           <ArrowLeft className="size-3.5" />
-          <span className="truncate max-w-[220px]">{fileTitle}</span>
+          <span className="truncate max-w-[220px]">{selectedFile.title}</span>
         </button>
       </div>
 
