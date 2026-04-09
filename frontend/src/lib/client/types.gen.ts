@@ -216,8 +216,10 @@ export type AddScheduleToCanvasData = {
         day: 'odd' | 'even';
         /**
          * Course Id
+         *
+         * Canvas course ID, fails if already set on input schedule
          */
-        course_id?: number | null | null;
+        course_id?: number | null;
     };
     url: '/pdfs/add';
 };

@@ -27,12 +27,13 @@ async def preview_uploaded_schedule(pdf: UploadFile) -> Eng10Schedule:
 
 
 @router.post("/add", summary="Add Canvas PlannerNotes from parsed schedule")
-async def add_schedule_to_canvas(client: HTTPClient, schedule: Eng10Schedule, day: Literal["odd", "even"], course_id: Annotated[int | None, Query(description="Canvas course ID, fails if already set on input schedule")] | None = None) -> list[PlannerNote]:
+async def add_schedule_to_canvas(client: HTTPClient, schedule: Eng10Schedule, day: Literal["odd", "even"], course_id: Annotated[int | None, Query(description="Canvas course ID, fails if already set on input schedule")] = None) -> list[PlannerNote]:
     notes = getattr(schedule, day + "_days")
     for note in notes:
-        if None not in (course_id, note.course_id) and note.course_id != course_id:
+        if course_id is not None and note.course_id is not None and note.course_id != course_id:
             raise HTTPException(status_code=422, detail=f"Note {note.id} belongs to course {note.course_id}, not {course_id}")
-        note.course_id = course_id
+        if course_id is not None:
+            note.course_id = course_id
     return await asyncio.gather(*(add_planner_note(client, note) for note in notes))  # TODO: Add semaphore
 
 

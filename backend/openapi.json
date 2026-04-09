@@ -108,22 +108,16 @@
             "schema": {
               "anyOf": [
                 {
-                  "anyOf": [
-                    {
-                      "type": "integer"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "description": "Canvas course ID, fails if already set on input schedule"
+                  "type": "integer"
                 },
                 {
                   "type": "null"
                 }
               ],
+              "description": "Canvas course ID, fails if already set on input schedule",
               "title": "Course Id"
-            }
+            },
+            "description": "Canvas course ID, fails if already set on input schedule"
           }
         ],
         "requestBody": {

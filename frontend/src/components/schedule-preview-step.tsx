@@ -166,6 +166,7 @@ export function SchedulePreviewStep({
       await addScheduleToCanvas({
         body: schedule!,
         query: { day, course_id: Number(courseId) },
+        throwOnError: true,
       })
       setAdded((prev) => new Set([...prev, day]))
     } catch {
