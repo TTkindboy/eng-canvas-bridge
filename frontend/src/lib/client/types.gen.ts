@@ -206,7 +206,7 @@ export type PreviewUploadedScheduleResponses = {
 
 export type PreviewUploadedScheduleResponse = PreviewUploadedScheduleResponses[keyof PreviewUploadedScheduleResponses];
 
-export type AddScheduleToPlannerData = {
+export type AddScheduleToCanvasData = {
     body: Eng10Schedule;
     path?: never;
     query: {
@@ -222,25 +222,25 @@ export type AddScheduleToPlannerData = {
     url: '/pdfs/add';
 };
 
-export type AddScheduleToPlannerErrors = {
+export type AddScheduleToCanvasErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type AddScheduleToPlannerError = AddScheduleToPlannerErrors[keyof AddScheduleToPlannerErrors];
+export type AddScheduleToCanvasError = AddScheduleToCanvasErrors[keyof AddScheduleToCanvasErrors];
 
-export type AddScheduleToPlannerResponses = {
+export type AddScheduleToCanvasResponses = {
     /**
-     * Response Add Schedule To Planner
+     * Response Add Schedule To Canvas
      *
      * Successful Response
      */
     200: Array<PlannerNote>;
 };
 
-export type AddScheduleToPlannerResponse = AddScheduleToPlannerResponses[keyof AddScheduleToPlannerResponses];
+export type AddScheduleToCanvasResponse = AddScheduleToCanvasResponses[keyof AddScheduleToCanvasResponses];
 
 export type GetCoursesData = {
     body?: never;

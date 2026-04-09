@@ -1,6 +1,10 @@
 import { client } from '@/lib/client/client.gen'
-import { getCourses, getPdfs, previewSchedule, previewUploadedSchedule, addScheduleToPlanner } from '@/lib/client'
-import type { Course, CourseFile, Eng10Schedule, PlannerNote } from '@/lib/client'
+import { getCourses, getPdfs, previewSchedule, previewUploadedSchedule } from '@/lib/client'
+import type { Course, CourseFile, Eng10Schedule } from '@/lib/client'
+// TODO: switch most bindings to be direct
+export { addScheduleToCanvas } from '@/lib/client';
+export type { PlannerNote } from '@/lib/client'
+
 
 client.setConfig({
   baseUrl: (import.meta.env.VITE_API_BASE_URL ?? '/api').replace(/\/$/, ''),
@@ -67,17 +71,4 @@ export async function fetchSchedulePreview(file: SelectedFile): Promise<Eng10Sch
     })
     return data
   }
-}
-
-export async function addToPlannerNotes(
-  fileId: string,
-  day: 'odd' | 'even',
-  courseId?: number,
-): Promise<PlannerNote[]> {
-  const { data } = await addScheduleToPlanner({
-    path: { file_id: Number(fileId) },
-    query: { day, course_id: courseId ?? null },
-    throwOnError: true,
-  })
-  return data
 }

@@ -27,7 +27,7 @@ async def preview_uploaded_schedule(pdf: UploadFile) -> Eng10Schedule:
 
 
 @router.post("/add", summary="Add Canvas PlannerNotes from parsed schedule")
-async def add_schedule_to_planner(client: HTTPClient, schedule: Eng10Schedule, day: Literal["odd", "even"], course_id: Annotated[int | None, Query(description="Canvas course ID, fails if already set on input schedule")] | None = None) -> list[PlannerNote]:
+async def add_schedule_to_canvas(client: HTTPClient, schedule: Eng10Schedule, day: Literal["odd", "even"], course_id: Annotated[int | None, Query(description="Canvas course ID, fails if already set on input schedule")] | None = None) -> list[PlannerNote]:
     notes = getattr(schedule, day + "_days")
     for note in notes:
         if None not in (course_id, note.course_id) and note.course_id != course_id:

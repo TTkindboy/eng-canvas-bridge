@@ -3,7 +3,7 @@ import useSWR from "swr"
 import { ArrowLeft, CalendarPlus, CheckCircle2 } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
 import { Button } from "@/components/ui/button"
-import { fetchSchedulePreview, addToPlannerNotes, type SelectedFile } from "@/lib/api"
+import { fetchSchedulePreview, addScheduleToCanvas, type SelectedFile } from "@/lib/api"
 import type { PlannerNote, Eng10Schedule } from "@/lib/client"
 import { cn } from "@/lib/utils"
 
@@ -161,11 +161,13 @@ export function SchedulePreviewStep({
   )
 
   const handleAdd = async (day: "odd" | "even") => {
-    if (!fileId) return
     setAdding(day)
     setAddError(null)
     try {
-      await addToPlannerNotes(fileId, day, Number(courseId))
+      await addScheduleToCanvas({
+        body: schedule!,
+        query: { day, course_id: Number(courseId) },
+      })
       setAdded((prev) => new Set([...prev, day]))
     } catch {
       setAddError(`Failed to add ${day} days to planner.`)

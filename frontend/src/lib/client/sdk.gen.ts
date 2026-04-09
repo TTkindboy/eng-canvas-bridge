@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { AddScheduleToPlannerData, AddScheduleToPlannerErrors, AddScheduleToPlannerResponses, DeleteNotesData, DeleteNotesErrors, DeleteNotesResponses, GetCoursesData, GetCoursesErrors, GetCoursesResponses, GetPdfsData, GetPdfsErrors, GetPdfsResponses, PreviewScheduleData, PreviewScheduleErrors, PreviewScheduleResponses, PreviewUploadedScheduleData, PreviewUploadedScheduleErrors, PreviewUploadedScheduleResponses } from './types.gen';
+import type { AddScheduleToCanvasData, AddScheduleToCanvasErrors, AddScheduleToCanvasResponses, DeleteNotesData, DeleteNotesErrors, DeleteNotesResponses, GetCoursesData, GetCoursesErrors, GetCoursesResponses, GetPdfsData, GetPdfsErrors, GetPdfsResponses, PreviewScheduleData, PreviewScheduleErrors, PreviewScheduleResponses, PreviewUploadedScheduleData, PreviewUploadedScheduleErrors, PreviewUploadedScheduleResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -41,7 +41,7 @@ export const previewUploadedSchedule = <ThrowOnError extends boolean = false>(op
 /**
  * Add Canvas PlannerNotes from parsed schedule
  */
-export const addScheduleToPlanner = <ThrowOnError extends boolean = false>(options: Options<AddScheduleToPlannerData, ThrowOnError>) => (options.client ?? client).post<AddScheduleToPlannerResponses, AddScheduleToPlannerErrors, ThrowOnError>({
+export const addScheduleToCanvas = <ThrowOnError extends boolean = false>(options: Options<AddScheduleToCanvasData, ThrowOnError>) => (options.client ?? client).post<AddScheduleToCanvasResponses, AddScheduleToCanvasErrors, ThrowOnError>({
     url: '/pdfs/add',
     ...options,
     headers: {

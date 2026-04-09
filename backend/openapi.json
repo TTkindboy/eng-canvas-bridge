@@ -86,7 +86,7 @@
     "/pdfs/add": {
       "post": {
         "summary": "Add Canvas PlannerNotes from parsed schedule",
-        "operationId": "add_schedule_to_planner",
+        "operationId": "add_schedule_to_canvas",
         "parameters": [
           {
             "name": "day",
@@ -146,7 +146,7 @@
                   "items": {
                     "$ref": "#/components/schemas/PlannerNote"
                   },
-                  "title": "Response Add Schedule To Planner"
+                  "title": "Response Add Schedule To Canvas"
                 }
               }
             }
