@@ -142,7 +142,6 @@ export function SchedulePreviewStep({
   const [adding, setAdding] = useState<"odd" | "even" | null>(null)
   const [added, setAdded] = useState<Set<"odd" | "even">>(new Set())
   const [addError, setAddError] = useState<string | null>(null)
-  const fileId = selectedFile.source === "canvas" ? selectedFile.id : undefined
   const previewKey =
     selectedFile.source === "canvas"
       ? (["schedule-preview", "canvas", selectedFile.id] as const)
@@ -179,7 +178,7 @@ export function SchedulePreviewStep({
   const activeNotes: PlannerNote[] = schedule ? schedule[activeTab] : []
   const isDone = added.has(activeTab)
   const isAddingActive = adding === activeTab
-  const isDisabled = !fileId || isAddingActive || isDone || adding !== null
+  const isDisabled = isAddingActive || isDone || adding !== null
 
   return (
     <div className="flex flex-col gap-6">
@@ -231,38 +230,32 @@ export function SchedulePreviewStep({
 
           <NoteList notes={activeNotes} />
 
-          {fileId ? (
-            <Button
-              onClick={() => handleAdd(activeTab)}
-              disabled={isDisabled}
-              variant={isDone ? "outline" : "default"}
-              className={cn(
-                "w-full gap-2 transition-all",
-                isDone && "border-foreground/20 text-muted-foreground",
-              )}
-            >
-              {isAddingActive ? (
-                <>
-                  <Spinner className="size-4" />
-                  Adding...
-                </>
-              ) : isDone ? (
-                <>
-                  <CheckCircle2 className="size-4" />
-                  Added to planner
-                </>
-              ) : (
-                <>
-                  <CalendarPlus className="size-4" />
-                  Add {activeTab} days to Canvas
-                </>
-              )}
-            </Button>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              Adding uploaded PDFs to Canvas is not wired up yet.
-            </p>
-          )}
+          <Button
+            onClick={() => handleAdd(activeTab)}
+            disabled={isDisabled}
+            variant={isDone ? "outline" : "default"}
+            className={cn(
+              "w-full gap-2 transition-all",
+              isDone && "border-foreground/20 text-muted-foreground",
+            )}
+          >
+            {isAddingActive ? (
+              <>
+                <Spinner className="size-4" />
+                Adding...
+              </>
+            ) : isDone ? (
+              <>
+                <CheckCircle2 className="size-4" />
+                Added to planner
+              </>
+            ) : (
+              <>
+                <CalendarPlus className="size-4" />
+                Add {activeTab} days to Canvas
+              </>
+            )}
+          </Button>
 
           {addError && (
             <p className="text-destructive text-sm">{addError}</p>
