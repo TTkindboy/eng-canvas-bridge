@@ -1,3 +1,4 @@
+from fastapi.middleware.cors import CORSMiddleware
 import asyncio
 import logging
 from collections.abc import Iterator
@@ -49,6 +50,15 @@ def custom_generate_unique_id(route: APIRoute):
     return route.name # TODO: Add tags to id-gen after I implement them
 
 app = FastAPI(lifespan=lifespan, generate_unique_id_function=custom_generate_unique_id)
+
+app.add_middleware(
+    CORSMiddleware,  # ty:ignore[invalid-argument-type]
+    allow_origins=get_settings().cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(pdfs.router)
 
 @app.get("/courses")
@@ -104,5 +114,3 @@ async def delete_notes(client: HTTPClient, course_id: int) -> BulkDeleteResult:
     total = len(planner_notes)
     deleted = sum(results)
     return BulkDeleteResult(total=total, deleted=deleted, failed=total - deleted)
-
-# MAYBE: Add method to preview current notes pre-deletion

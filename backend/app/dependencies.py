@@ -17,6 +17,7 @@ type HTTPClient = Annotated[httpx.AsyncClient, Depends(get_client)]
 class Settings(BaseSettings):
     canvas_api_key: str
     site_url: str = "https://friendsseminary.instructure.com"
+    cors_origins: list[str] = [] # TODO: Maybe find env var that marks fastapi cloud prod so inbound requests don't silently fail
 
     @computed_field
     @property
