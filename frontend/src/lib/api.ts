@@ -7,7 +7,7 @@ export type { PlannerNote } from '@/lib/client'
 
 
 client.setConfig({
-  baseUrl: (import.meta.env.VITE_API_BASE_URL ?? '/api').replace(/\/$/, ''),
+  baseUrl: import.meta.env.PROD ? import.meta.env.VITE_API_URL : '/api',
 })
 
 export interface CourseOption {
