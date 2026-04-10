@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { AddScheduleToCanvasData, AddScheduleToCanvasErrors, AddScheduleToCanvasResponses, DeleteNotesData, DeleteNotesErrors, DeleteNotesResponses, GetCoursesData, GetCoursesErrors, GetCoursesResponses, GetPdfsData, GetPdfsErrors, GetPdfsResponses, PreviewScheduleData, PreviewScheduleErrors, PreviewScheduleResponses, PreviewUploadedScheduleData, PreviewUploadedScheduleErrors, PreviewUploadedScheduleResponses } from './types.gen';
+import type { AddScheduleToCanvasData, AddScheduleToCanvasErrors, AddScheduleToCanvasResponses, AuthViaApiKeyData, AuthViaApiKeyErrors, AuthViaApiKeyResponses, DeleteNotesData, DeleteNotesErrors, DeleteNotesResponses, GetCoursesData, GetCoursesErrors, GetCoursesResponses, GetPdfsData, GetPdfsErrors, GetPdfsResponses, PreviewScheduleData, PreviewScheduleErrors, PreviewScheduleResponses, PreviewUploadedScheduleData, PreviewUploadedScheduleErrors, PreviewUploadedScheduleResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -64,3 +64,15 @@ export const getPdfs = <ThrowOnError extends boolean = false>(options: Options<G
  * Delete all planner notes for a course
  */
 export const deleteNotes = <ThrowOnError extends boolean = false>(options: Options<DeleteNotesData, ThrowOnError>) => (options.client ?? client).delete<DeleteNotesResponses, DeleteNotesErrors, ThrowOnError>({ url: '/courses/{course_id}/notes', ...options });
+
+/**
+ * Auth Via Api Key
+ */
+export const authViaApiKey = <ThrowOnError extends boolean = false>(options: Options<AuthViaApiKeyData, ThrowOnError>) => (options.client ?? client).post<AuthViaApiKeyResponses, AuthViaApiKeyErrors, ThrowOnError>({
+    url: '/auth',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
