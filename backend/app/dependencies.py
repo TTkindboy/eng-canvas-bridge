@@ -1,9 +1,10 @@
+from __future__ import annotations
 from functools import cache
-from typing import Annotated
+from typing import Annotated, Literal
 
 import httpx
 from fastapi import Depends, HTTPException, Request
-from pydantic import computed_field
+from pydantic import computed_field, model_validator
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
@@ -11,6 +12,23 @@ class Settings(BaseSettings):
     session_secret: str = "dev-session-secret"  # fallback for local tooling/dev
     site_url: str = "https://friendsseminary.instructure.com"
     cors_origins: list[str] = [] # TODO: Maybe find env var that marks fastapi cloud prod so inbound requests don't silently fail
+    app_env: Literal["prod", "dev"] = "dev"
+
+    @property
+    def is_prod(self) -> bool:
+        return self.app_env == "prod"
+
+    @model_validator(mode="after")
+    def validate_prod_config(self) -> Settings:
+        if not self.is_prod:
+            return self
+        if self.canvas_api_key is not None:
+            raise ValueError("canvas_api_key must not be set in production.")
+        if not self.cors_origins:
+            raise ValueError("cors_origins must be set in production.")
+        if self.session_secret == "dev-session-secret":
+            raise ValueError("session_secret must be set to a non-default value in production.")
+        return self
 
     @computed_field
     @property
