@@ -5,12 +5,11 @@ description = "Converts Friends Seminary english schedule PDFs to Canvas planner
 # readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "fastapi[standard-no-fastapi-cloud-cli]>=0.135.1",
+    "fastapi[standard]>=0.135.1",
     "httpx>=0.28.1",
     "itsdangerous>=2.2.0",
     "pydantic>=2.12.5",
     "pymupdf>=1.27.2",
-    "time-machine>=3.2.0",
 ]
 
 [tool.fastapi]
@@ -25,6 +24,7 @@ dev = [
 test = [
     "inline-snapshot>=0.32.5",
     "pytest>=9.0.2",
+    "time-machine>=3.2.0",
 ]
 
 [tool.pytest.ini_options]
