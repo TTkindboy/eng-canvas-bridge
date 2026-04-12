@@ -24,11 +24,13 @@ async def lifespan(app: FastAPI):
 def custom_generate_unique_id(route: APIRoute):
     return route.name # TODO: Add tags to id-gen after I implement them
 
+_is_prod = get_settings().is_prod
 app = FastAPI(
     lifespan=lifespan,
     generate_unique_id_function=custom_generate_unique_id,
-    docs_url=None if get_settings().is_prod else "/docs",
-    redoc_url=None if get_settings().is_prod else "/redoc",
+    openapi_url=None if _is_prod else "/openapi.json",
+    docs_url=None if _is_prod else "/docs",
+    redoc_url=None if _is_prod else "/redoc",
 )
 
 app.add_middleware(
@@ -42,8 +44,8 @@ app.add_middleware(
 app.add_middleware(
     SessionMiddleware,  # ty:ignore[invalid-argument-type]
     secret_key=get_settings().session_secret,
-    https_only=get_settings().is_prod,
-    same_site = "none" if get_settings().is_prod else "lax",
+    https_only=_is_prod,
+    same_site = "none" if _is_prod else "lax",
 )
 
 app.include_router(pdfs.router)
