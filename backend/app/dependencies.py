@@ -20,7 +20,7 @@ class Settings(BaseSettings):
 @cache
 def get_settings() -> Settings:
     """Return the cached application settings instance."""
-    return Settings()  # ty:ignore[missing-argument]
+    return Settings()
 
 type SettingsDep = Annotated[Settings, Depends(get_settings)]
 

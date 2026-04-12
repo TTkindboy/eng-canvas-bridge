@@ -1,8 +1,9 @@
+import logging
 from contextlib import asynccontextmanager
 from typing import Annotated
 
 import httpx
-from fastapi import Body, FastAPI, Request, Response
+from fastapi import Body, FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.routing import APIRoute
 from starlette.middleware.sessions import SessionMiddleware
@@ -12,6 +13,8 @@ from .routers import courses, pdfs
 
 # TODO: Propagate Canvas API errors
 # TODO: Implement pagination helper
+
+logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -35,13 +38,21 @@ app.add_middleware(
     SessionMiddleware,  # ty:ignore[invalid-argument-type]
     secret_key=get_settings().session_secret,
     # https_only=True,
-    same_site = "none", # this really feels hacky
+    same_site = "lax", # this really feels hacky
 )
 
 app.include_router(pdfs.router)
 app.include_router(courses.router)
 
 @app.post("/auth")
-def auth_via_api_key(request: Request, api_key: Annotated[str, Body(embed=True)]):
+async def auth_via_api_key(request: Request, api_key: Annotated[str, Body(embed=True)]):
+    logger.log(logging.INFO, str(get_settings().canvas_api_key is not None))
+    if (key := get_settings().canvas_api_key) is not None:
+        logger.warning("Using dev API key, which is not secure for production use")
+        api_key = key
+    resp = await request.state.http_client.get("/users/self", headers={"Authorization": f"Bearer {api_key}"})
+    if resp.status_code == 401:
+        raise HTTPException(status_code=401, detail="Invalid Canvas API key")
+    resp.raise_for_status()
     request.session["canvas_api_key"] = api_key
     return Response(status_code=204)
