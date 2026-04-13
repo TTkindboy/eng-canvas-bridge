@@ -45,7 +45,7 @@ app.add_middleware(
     SessionMiddleware,  # ty:ignore[invalid-argument-type]
     secret_key=get_settings().session_secret,
     https_only=_is_prod,
-    same_site = "none" if _is_prod else "lax",
+    same_site="none" if _is_prod else "lax",
 )
 
 app.include_router(pdfs.router)
