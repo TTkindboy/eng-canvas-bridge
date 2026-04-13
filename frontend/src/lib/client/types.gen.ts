@@ -5,6 +5,16 @@ export type ClientOptions = {
 };
 
 /**
+ * Body_auth_via_api_key
+ */
+export type BodyAuthViaApiKey = {
+    /**
+     * Api Key
+     */
+    api_key: string;
+};
+
+/**
  * Body_preview_uploaded_schedule
  */
 export type BodyPreviewUploadedSchedule = {
@@ -337,3 +347,26 @@ export type DeleteNotesResponses = {
 };
 
 export type DeleteNotesResponse = DeleteNotesResponses[keyof DeleteNotesResponses];
+
+export type AuthViaApiKeyData = {
+    body: BodyAuthViaApiKey;
+    path?: never;
+    query?: never;
+    url: '/auth';
+};
+
+export type AuthViaApiKeyErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type AuthViaApiKeyError = AuthViaApiKeyErrors[keyof AuthViaApiKeyErrors];
+
+export type AuthViaApiKeyResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};

@@ -1,44 +1,20 @@
-import asyncio
 import logging
-from collections.abc import Iterator
 from contextlib import asynccontextmanager
-from typing import Any
+from typing import Annotated
 
 import httpx
-from fastapi import FastAPI
+from fastapi import Body, FastAPI, HTTPException, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.routing import APIRoute
-from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
+from starlette.middleware.sessions import SessionMiddleware
 
-from .routers import pdfs
-from .parsers.base import PlannerNote
-from .dependencies import HTTPClient, canvas_auth, get_settings
+from .dependencies import get_settings
+from .routers import courses, pdfs
 
 # TODO: Propagate Canvas API errors
 # TODO: Implement pagination helper
 
 logger = logging.getLogger(__name__)
-
-class Course(BaseModel):
-    model_config = ConfigDict(extra="allow")
-
-    id: int
-    name: str
-    course_code: str
-
- # MAYBE: sort by date modified in future?(might add too many api calls)
-class CourseFile(BaseModel):
-    model_config = ConfigDict(extra="allow")
-
-    file_id: int = Field(validation_alias="content_id")
-    item_id: int = Field(validation_alias="id") # might remove later if still not needed
-    title: str
-
-# MAYBE: include IDs later
-class BulkDeleteResult(BaseModel):
-    total: int
-    deleted: int
-    failed: int
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -48,61 +24,42 @@ async def lifespan(app: FastAPI):
 def custom_generate_unique_id(route: APIRoute):
     return route.name # TODO: Add tags to id-gen after I implement them
 
-app = FastAPI(lifespan=lifespan, generate_unique_id_function=custom_generate_unique_id)
+_is_prod = get_settings().is_prod
+app = FastAPI(
+    lifespan=lifespan,
+    generate_unique_id_function=custom_generate_unique_id,
+    openapi_url=None if _is_prod else "/openapi.json",
+    docs_url=None if _is_prod else "/docs",
+    redoc_url=None if _is_prod else "/redoc",
+)
+
+app.add_middleware(
+    CORSMiddleware,  # ty:ignore[invalid-argument-type]
+    allow_origins=get_settings().cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.add_middleware(
+    SessionMiddleware,  # ty:ignore[invalid-argument-type]
+    secret_key=get_settings().session_secret,
+    https_only=_is_prod,
+    same_site="none" if _is_prod else "lax",
+)
+
 app.include_router(pdfs.router)
+app.include_router(courses.router)
 
-@app.get("/courses")
-async def get_courses(client: HTTPClient, inactive: bool = False) -> list[Course]:
-    params: dict[str, Any] = {"per_page": 100}
-    if not inactive:
-        params["enrollment_state"] = "active"
-    courses_resp = await client.get("/courses", headers=canvas_auth(), params=params)
-    courses_resp.raise_for_status()
-    return courses_resp.json()
-
-# Maybe add query parameter to limit to schedules
-@app.get("/courses/{course_id}/pdfs", summary="List course PDFs")
-async def get_pdfs(client: HTTPClient, course_id: int) -> list[CourseFile]: # TODO: Strengthen include parameter
-    # assumes filenames include .pdf, which is not always the case. Maybe use mime_class in future
-    params: dict[str, Any] = {"include": ["items"], "per_page": 100, "search_term": ".pdf"}
-    resp = await client.get(f"/courses/{course_id}/modules", headers=canvas_auth(), params=params)
+@app.post("/auth")
+async def auth_via_api_key(request: Request, api_key: Annotated[str, Body(embed=True)]):
+    logger.log(logging.INFO, str(get_settings().canvas_api_key is not None))
+    if (key := get_settings().canvas_api_key) is not None:
+        logger.warning("Using dev API key, which is not secure for production use")
+        api_key = key
+    resp = await request.state.http_client.get("/users/self", headers={"Authorization": f"Bearer {api_key}"})
+    if resp.status_code == 401:
+        raise HTTPException(status_code=401, detail="Invalid Canvas API key")
     resp.raise_for_status()
-    return [
-        file
-        for _, file in sorted(iter_files(resp.json()), key=lambda t: t[0])
-    ]
-
-def iter_files(modules: list[dict[str, Any]]) -> Iterator[tuple[tuple[int, int], CourseFile]]:
-    for module in modules:
-        for item in module["items"]:
-            if item["type"] == "File":
-                yield (module["position"], item["position"]), CourseFile.model_validate(item)
-
-
-_planner_notes_adapter = TypeAdapter(list[PlannerNote])
-
-async def delete_note(client: httpx.AsyncClient, note: PlannerNote) -> bool:
-    try:
-        resp = await client.delete(f"/planner_notes/{note.id}", headers=canvas_auth())
-        resp.raise_for_status()
-        logger.info("Deleted note: %s (%s)", note.title, note.todo_date)
-        return True
-    except httpx.HTTPError as e:
-        logger.error("Failed to delete note: %s (%s): %s", note.title, note.todo_date, e)
-        return False
-
-# TODO: Add semaphore
-@app.delete("/courses/{course_id}/notes", summary="Delete all planner notes for a course") # might not be idiomatic for webapp
-async def delete_notes(client: HTTPClient, course_id: int) -> BulkDeleteResult:
-    params = {"context_codes[]": f"course_{course_id}", "per_page": 100}
-    resp = await client.get("/planner_notes", params=params, headers=canvas_auth())
-    resp.raise_for_status()
-    # resp.content to use rust validate_json speedup(canvas api is utf-8)
-    planner_notes: list[PlannerNote] = _planner_notes_adapter.validate_json(resp.content)
-    results = await asyncio.gather(*(delete_note(client, note) for note in planner_notes))
-
-    total = len(planner_notes)
-    deleted = sum(results)
-    return BulkDeleteResult(total=total, deleted=deleted, failed=total - deleted)
-
-# MAYBE: Add method to preview current notes pre-deletion
+    request.session["canvas_api_key"] = api_key
+    return Response(status_code=204)
