@@ -10,9 +10,13 @@ export default function App() {
   const [authenticated, setAuthenticated] = useState<boolean | null>(null)
 
   useEffect(() => {
-    getCourses().then(({ response }) => {
-      setAuthenticated(response.status !== 401)
-    })
+    getCourses()
+      .then(({ response }) => {
+        setAuthenticated(response?.ok ?? false)
+      })
+      .catch(() => {
+        setAuthenticated(false)
+      })
   }, [])
   const [selectedCourse, setSelectedCourse] = useState<{ id: string; name: string } | undefined>()
   const [selectedFile, setSelectedFile] = useState<SelectedFile | undefined>()

@@ -22,10 +22,17 @@ export function AuthScreen({ onAuthenticated }: AuthScreenProps) {
     setError(null)
 
     try {
-      await authViaApiKey({ body: { api_key: apiKey.trim() }, throwOnError: true })
-      onAuthenticated()
+      const { response } = await authViaApiKey({ body: { api_key: apiKey.trim() } })
+
+      if (response?.ok) {
+        onAuthenticated()
+      } else if (response?.status === 401) {
+        setError("Invalid API key. Please check and try again.")
+      } else {
+        setError("Unable to reach the backend. Check the server and try again.")
+      }
     } catch {
-      setError("Invalid API key. Please check and try again.")
+      setError("Unable to reach the backend. Check the server and try again.")
     } finally {
       setLoading(false)
     }
