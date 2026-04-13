@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     canvas_api_key: str | None = None  # fallback for local dev
     session_secret: str = "dev-session-secret"  # fallback for local tooling/dev
     site_url: str = "https://friendsseminary.instructure.com"
-    cors_origins: list[str] = [] # TODO: Maybe find env var that marks fastapi cloud prod so inbound requests don't silently fail
+    cors_origins: list[str] = []  # TODO: Maybe find env var that marks fastapi cloud prod so inbound requests don't silently fail
     app_env: Literal["prod", "dev"] = "dev"
 
     @property
