@@ -1,4 +1,5 @@
 from __future__ import annotations
+import logfire
 from typing import override
 import re
 from .base import DualSchedule, TextPdfMixin, nearest_matching_date, PlannerNote
@@ -7,6 +8,7 @@ from .base import DualSchedule, TextPdfMixin, nearest_matching_date, PlannerNote
 class Eng10Schedule(DualSchedule, TextPdfMixin):
     @classmethod
     @override
+    @logfire.instrument("parse eng10 schedule")
     def from_pdf_bytes(cls, pdf_bytes: bytes, course_id: int | None = None) -> Eng10Schedule:
         pdf_text = cls.extract_text_from_pdf(pdf_bytes)
         matches = re.findall(

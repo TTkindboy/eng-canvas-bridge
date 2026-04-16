@@ -1,17 +1,16 @@
 import asyncio
-import logging
 from collections.abc import Iterator
 from typing import Any
 
 import httpx
+import logfire
 from fastapi import APIRouter
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 
-from ..dependencies import HTTPClient, CanvasAuth
+from ..dependencies import CanvasAuth, HTTPClient
 from ..parsers.base import PlannerNote
 
 router = APIRouter(prefix="/courses")
-logger = logging.getLogger(__name__)
 
 class Course(BaseModel):
     model_config = ConfigDict(extra="allow")
@@ -69,10 +68,9 @@ async def delete_note(client: httpx.AsyncClient, auth: CanvasAuth, note: Planner
     try:
         resp = await client.delete(f"/planner_notes/{note.id}", headers=auth)
         resp.raise_for_status()
-        logger.info("Deleted note: %s (%s)", note.title, note.todo_date)
         return True
     except httpx.HTTPError as e:
-        logger.error("Failed to delete note: %s (%s): %s", note.title, note.todo_date, e)
+        logfire.warning("Failed to delete note: {title}", title=note.title, date=note.todo_date, error=str(e))
         return False
 
 # TODO: Add semaphore
@@ -87,4 +85,12 @@ async def delete_notes(client: HTTPClient, auth: CanvasAuth, course_id: int) -> 
 
     total = len(planner_notes)
     deleted = sum(results)
-    return BulkDeleteResult(total=total, deleted=deleted, failed=total - deleted)
+    failed = total - deleted
+    logfire.info(
+        "Deleted planner notes for course {course_id}",
+        course_id=course_id,
+        total=total,
+        deleted=deleted,
+        failed=failed,
+    )
+    return BulkDeleteResult(total=total, deleted=deleted, failed=failed)
