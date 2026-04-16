@@ -14,7 +14,11 @@ from .routers import courses, pdfs
 # TODO: Propagate Canvas API errors
 # TODO: Implement pagination helper
 
-logfire.configure(send_to_logfire="if-token-present", environment=get_settings().app_env)
+logfire.configure(
+    send_to_logfire="if-token-present",
+    environment=get_settings().app_env,
+    distributed_tracing=False, # to stop FastAPI Cloud traceparent
+)
 
 
 @asynccontextmanager
