@@ -64,7 +64,7 @@ async def auth_via_api_key(request: Request, api_key: Annotated[str, Body(embed=
     if (key := get_settings().canvas_api_key) is not None:
         logfire.warning("Using dev API key, which is not secure for production use")
         api_key = key
-    resp = await request.state.http_client.get("/users/self", headers={"Authorization": f"Bearer {api_key}"})
+    resp = await request.state.http_client.get("/users/self/profile", headers={"Authorization": f"Bearer {api_key}"})
     if resp.status_code == 401:
         raise HTTPException(status_code=401, detail="Invalid Canvas API key")
     resp.raise_for_status()
