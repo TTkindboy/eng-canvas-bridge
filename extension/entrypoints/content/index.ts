@@ -1,5 +1,6 @@
 import './style.css';
 import calendarAddIcon from '@instructure/ui-icons/svg/Line/calendar-add.svg?raw';
+import { handleAddToCalendar } from './addToCalendar';
 
 export default defineContentScript({
   matches: ['*://friendsseminary.instructure.com/courses/*/files/*'],
@@ -14,7 +15,9 @@ export default defineContentScript({
         const btn = document.createElement('button');
         btn.className = 'cb-btn';
         btn.style.marginLeft = '12px';
-        btn.innerHTML = `<span class="cb-btn__content">${calendarAddIcon} Save</span>`;
+        const text = 'Add to Calendar';
+        btn.innerHTML = `<span class="cb-btn__content">${calendarAddIcon} ${text}</span>`;
+        btn.addEventListener('click', handleAddToCalendar);
         container.append(btn);
       },
     });
