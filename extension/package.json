@@ -12,9 +12,11 @@
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
     "compile": "tsc --noEmit",
+    "openapi-ts": "openapi-ts",
     "postinstall": "wxt prepare"
   },
   "devDependencies": {
+    "@hey-api/openapi-ts": "0.94.2",
     "typescript": "^5.9.3",
     "wxt": "^0.20.25"
   },

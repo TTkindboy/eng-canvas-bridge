@@ -55,7 +55,7 @@ snapshot:
 alias gen := generate
 
 [group('generate')]
-generate: export-openapi generate-client
+generate: export-openapi generate-client generate-extension-client
 
 [group('generate')]
 [working-directory: 'backend']
@@ -67,4 +67,9 @@ alias gen-api := generate-client
 [group('generate')]
 [working-directory: 'frontend']
 generate-client:
+  pnpm run openapi-ts
+
+[group('generate')]
+[working-directory: 'extension']
+generate-extension-client:
   pnpm run openapi-ts
