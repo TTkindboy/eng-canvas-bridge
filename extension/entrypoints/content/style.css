@@ -2,7 +2,6 @@
   display: inline-block;
   box-sizing: border-box;
   cursor: pointer;
-  height: 38px;
   padding: 0;
   margin: 0;
   border: none;
@@ -23,10 +22,17 @@
   background-color: var(--ic-brand-button--primary-bgd-darkened-5, #065f8a);
 }
 
+.cb-btn__content svg {
+  width: 1em;
+  height: 1em;
+  margin-right: 6px;
+  fill: currentColor;
+  vertical-align: middle;
+}
+
 .cb-btn__content {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 12px;
-  height: 100%;
+  padding: 4px 8px;
 }

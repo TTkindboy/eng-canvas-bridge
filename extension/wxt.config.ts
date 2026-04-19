@@ -1,4 +1,12 @@
 import { defineConfig } from 'wxt';
+import path from 'path';
 
-// See https://wxt.dev/api/config.html
-export default defineConfig({});
+export default defineConfig({
+  vite: () => ({
+    resolve: {
+      alias: {
+        '@instructure/ui-icons/svg': path.resolve(__dirname, 'node_modules/@instructure/ui-icons/svg'),
+      },
+    },
+  }),
+});
