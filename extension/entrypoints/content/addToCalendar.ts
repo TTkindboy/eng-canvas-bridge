@@ -7,13 +7,22 @@ client.setConfig({
 });
 
 
+function getCanvasBaseUrl(): string {
+  return window.location.origin;
+}
+
 function getCanvasPdfDownloadUrl(fileId: string): string {
-  return `${window.location.origin}/files/${fileId}/download`
+  return `${getCanvasBaseUrl()}/files/${fileId}/download`;
 }
 
 function getCanvasFileId(url = window.location.href): string | null {
   return new URL(url).pathname.match(/\/files\/(\d+)/)?.[1] ?? null
 }
+
+function getCanvasCourseId(url = window.location.href): number | null {
+  return Number(new URL(url).pathname.match(/\/courses\/(\d+)/)?.[1]) ?? null
+}
+
 
 export async function handleAddToCalendar() {
   const pdfResponse = await fetch(getCanvasPdfDownloadUrl(getCanvasFileId() ?? ''), {
@@ -33,5 +42,26 @@ export async function handleAddToCalendar() {
 
   console.log('Parsed schedule:', schedule)
 
-  alert(`Button clicked!\nFile ID: ${getCanvasFileId()}`)
+  alert(`Button clicked!\nFile ID: ${getCanvasFileId()}\nCourse ID: ${getCanvasCourseId()}`)
+  console.log(addPlannerNote(getCanvasCourseId(), 'TEST FROM EXTENSION', '2026-04-21'))
+}
+
+async function addPlannerNote(courseId: number | null, title: string, todoDate: string) {
+  const csrfToken = decodeURIComponent(document.cookie.match(/_csrf_token=([^;]+)/)?.[1] ?? "");
+  const response = await fetch(`${getCanvasBaseUrl()}/api/v1/planner_notes`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRF-Token": csrfToken,
+      "X-Requested-With": "XMLHttpRequest",
+    },
+    body: JSON.stringify({context_type: "Course", course_id: courseId, todo_date: todoDate, title}),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to add planner note: ${response.status}`);
+  }
+
+  return await response.json();
 }
