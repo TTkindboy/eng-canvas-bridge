@@ -2,6 +2,7 @@ import { defineConfig } from 'wxt';
 import path from 'path';
 
 export default defineConfig({
+  modules: ['@wxt-dev/module-react'],
   vite: () => ({
     resolve: {
       alias: {
