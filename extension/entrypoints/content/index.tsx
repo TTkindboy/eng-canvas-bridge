@@ -7,7 +7,7 @@ function AddToCalendarButton() {
   return (
     <button className="cb-btn" style={{ marginLeft: 12 }} type="button" onClick={handleAddToCalendar}>
       <span className="cb-btn__content">
-        <span aria-hidden="true" dangerouslySetInnerHTML={{ __html: calendarAddIcon }} />
+        <span className="cb-btn__icon" aria-hidden="true" dangerouslySetInnerHTML={{ __html: calendarAddIcon }} />
         Add to Calendar
       </span>
     </button>

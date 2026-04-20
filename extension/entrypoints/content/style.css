@@ -25,9 +25,14 @@
 .cb-btn__content svg {
   width: 1em;
   height: 1em;
-  margin-right: 6px;
   fill: currentColor;
-  vertical-align: middle;
+  display: block;
+}
+
+.cb-btn__icon {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 6px;
 }
 
 .cb-btn__content {
