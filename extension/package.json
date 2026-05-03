@@ -24,8 +24,10 @@
     "wxt": "^0.20.25"
   },
   "dependencies": {
+    "@dnd-kit/react": "^0.4.0",
     "@instructure/ui-buttons": "^11.7.1",
     "@instructure/ui-icons": "^11.7.1",
+    "@instructure/ui-modal": "^11.7.1",
     "react": "^19.2.5",
     "react-dom": "^19.2.5"
   }

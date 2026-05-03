@@ -1,4 +1,5 @@
-import { previewUploadedSchedule } from '@/lib/client/sdk.gen';
+import { addScheduleToCanvas, previewUploadedSchedule } from '@/lib/client/sdk.gen';
+import type { Eng10Schedule } from '@/lib/client/types.gen';
 import { client } from '../../lib/client/client.gen';
 
 client.setConfig({
@@ -24,7 +25,7 @@ function getCanvasCourseId(url = window.location.href): number | null {
 }
 
 
-export async function handleAddToCalendar() {
+export async function handleAddToCalendar(): Promise<Eng10Schedule> {
   const pdfResponse = await fetch(getCanvasPdfDownloadUrl(getCanvasFileId() ?? ''), {
     credentials: 'include',
   })
@@ -40,10 +41,28 @@ export async function handleAddToCalendar() {
     throwOnError: true,
   })
 
-  console.log('Parsed schedule:', schedule)
+  if (!schedule) {
+    throw new Error('Failed to parse schedule')
+  }
 
-  alert(`Button clicked!\nFile ID: ${getCanvasFileId()}\nCourse ID: ${getCanvasCourseId()}`)
-  console.log(addPlannerNote(getCanvasCourseId(), 'TEST FROM EXTENSION', '2026-04-21'))
+  console.log('Parsed schedule:', schedule)
+  return schedule
+}
+
+export type SectionAssignments = Record<string, 'odd' | 'even'>;
+
+export async function addAssignedScheduleToCanvas(schedule: Eng10Schedule, assignments: SectionAssignments) {
+  const assignedDays = Array.from(new Set(Object.values(assignments)));
+
+  return await Promise.all(
+    assignedDays.map((day) =>
+      addScheduleToCanvas({
+        body: schedule,
+        query: { day, course_id: getCanvasCourseId() },
+        throwOnError: true,
+      }),
+    ),
+  );
 }
 
 async function addPlannerNote(courseId: number | null, title: string, todoDate: string) {
