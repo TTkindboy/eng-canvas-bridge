@@ -1,6 +1,7 @@
 import calendar
 from datetime import date, datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import pytest
 from inline_snapshot import snapshot
@@ -8,7 +9,7 @@ from inline_snapshot import snapshot
 from app.parsers.base import nearest_matching_date, PlannerNote
 from app.parsers.eng10 import Eng10Schedule
 
-pytestmark = pytest.mark.time_machine(datetime(2026, 4, 5, 12, 0))  # The day I wrote the tests (fixed anchor date so tests are deterministic)
+pytestmark = pytest.mark.time_machine(datetime(2026, 4, 5, 12, 0, tzinfo=ZoneInfo("America/New_York")))  # The day I wrote the tests (fixed anchor date so tests are deterministic)
 
 
 @pytest.mark.parametrize(  # TODO: Also check x num of random dates and verify existence and closest(idk how i would do that)

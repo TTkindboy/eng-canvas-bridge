@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from datetime import date, datetime
 from math import inf
 from typing import Annotated, Any
+from zoneinfo import ZoneInfo
 
 import pymupdf
 from pydantic import BaseModel, BeforeValidator, Field, RootModel, ConfigDict
@@ -41,7 +42,7 @@ WEEKDAY_MAP = { # TODO: ADD WEEKEND PARSING
 
 def nearest_matching_date(month: int, day: int, weekday: str | int | calendar.Day, base_date: date | None = None) -> date:
     if base_date is None:
-        base_date = date.today()
+        base_date = datetime.now(tz=ZoneInfo("America/New_York")).date()
     if isinstance(weekday, str):
         weekday = WEEKDAY_MAP[weekday]
     best = None
