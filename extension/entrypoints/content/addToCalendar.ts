@@ -49,13 +49,11 @@ export async function handleAddToCalendar(): Promise<Eng10Schedule> {
   return schedule
 }
 
-export type SectionAssignments = Record<string, 'odd' | 'even'>;
-
-export async function addAssignedScheduleToCanvas(schedule: Eng10Schedule, assignments: SectionAssignments) {
-  const assignedDays = Array.from(new Set(Object.values(assignments)));
+export async function addParsedScheduleToCanvas(schedule: Eng10Schedule) {
+  const days = ['odd', 'even'] as const;
 
   return await Promise.all(
-    assignedDays.map((day) =>
+    days.map((day) =>
       addScheduleToCanvas({
         body: schedule,
         query: { day, course_id: getCanvasCourseId() },

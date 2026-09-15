@@ -39,6 +39,7 @@ cache-dir = "~/.cache/ruff"
 
 [tool.ruff.lint]
 extend-select = ["FAST", "UP", "SIM", "C4", "FURB"]
+ignore = ["I001"]
 
 # [project.scripts]
 # export-openapi = "scripts.export_openapi:main" # disabled because we would need to implement build system

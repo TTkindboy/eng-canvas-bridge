@@ -30,7 +30,24 @@ FastAPI backend + PyMuPDF. Frontend: React + Vite, with a type-safe API client g
 
 ## Development
 
-**Prerequisites:** Python 3.13+, `uv`, Node.js 24+, `pnpm`, `just`
+**Prerequisites:** [mise](https://mise.jdx.dev/), Python 3.13+
+
+Install just at the root and the tools configured in each subfolder:
+
+```sh
+mise trust
+mise install
+mise -C backend install
+mise -C frontend install
+mise -C extension install
+```
+
+Activate mise in your shell (`eval "$(mise activate zsh)"`, or the equivalent for your shell)
+to use the tools directly, or prefix commands with `mise exec --`.
+The `backend`, `frontend`, and `extension` folders each have a `mise.toml`;
+backend configures uv, while frontend and extension configure Node.js and pnpm.
+Each inherits just from the root configuration. Just recipes run through
+`mise exec` in their working directory to select that folder's tools.
 
 ```sh
 just install  # uv sync + pnpm install

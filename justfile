@@ -1,4 +1,5 @@
 set dotenv-load
+set shell := ["mise", "exec", "--", "sh", "-cu"]
 
 frontend_delay := '0.75'
 
