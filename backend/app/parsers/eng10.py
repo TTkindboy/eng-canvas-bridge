@@ -2,12 +2,16 @@ from __future__ import annotations
 import logfire
 from typing import override
 import re
-from .base import DualSchedule, TextPdfMixin, nearest_matching_date, PlannerNote
+from .base import BaseSchedule, DualSchedule, TextPdfMixin, nearest_matching_date, PlannerNote
 
 
-class Eng10Schedule(DualSchedule, TextPdfMixin):
+class Eng10Schedule(DualSchedule, BaseSchedule, TextPdfMixin):
     @classmethod
     @override
+    def from_bytes(cls, data: bytes, course_id: int | None = None) -> Eng10Schedule:
+        return cls.from_pdf_bytes(data, course_id=course_id)
+
+    @classmethod
     @logfire.instrument("parse eng10 schedule")
     def from_pdf_bytes(cls, pdf_bytes: bytes, course_id: int | None = None) -> Eng10Schedule:
         pdf_text = cls.extract_text_from_pdf(pdf_bytes)

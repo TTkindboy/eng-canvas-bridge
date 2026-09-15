@@ -23,7 +23,7 @@ function AddToCalendarButton() {
       setStatus('idle');
       setError(submitting
         ? 'Failed to add schedule days to Canvas.'
-        : 'Failed to parse this Canvas schedule PDF.');
+        : 'Failed to parse this Canvas schedule file.');
     }
   }
 

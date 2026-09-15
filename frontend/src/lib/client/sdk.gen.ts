@@ -19,14 +19,14 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 };
 
 /**
- * Preview schedule from PDF
+ * Preview schedule from PDF or DOCX
  */
 export const previewSchedule = <ThrowOnError extends boolean = false>(options: Options<PreviewScheduleData, ThrowOnError>) => (options.client ?? client).get<PreviewScheduleResponses, PreviewScheduleErrors, ThrowOnError>({ url: '/pdfs/{file_id}', ...options });
 
 /**
  * Preview Uploaded Schedule
  *
- * Preview schedule from PDF upload
+ * Preview schedule from PDF or DOCX upload
  */
 export const previewUploadedSchedule = <ThrowOnError extends boolean = false>(options: Options<PreviewUploadedScheduleData, ThrowOnError>) => (options.client ?? client).post<PreviewUploadedScheduleResponses, PreviewUploadedScheduleErrors, ThrowOnError>({
     ...formDataBodySerializer,

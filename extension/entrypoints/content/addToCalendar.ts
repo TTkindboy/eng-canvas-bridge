@@ -1,5 +1,5 @@
 import { addScheduleToCanvas, previewUploadedSchedule } from '@/lib/client/sdk.gen';
-import type { Eng10Schedule } from '@/lib/client/types.gen';
+import type { DualSchedule } from '@/lib/client/types.gen';
 import { client } from '../../lib/client/client.gen';
 
 client.setConfig({
@@ -25,7 +25,7 @@ function getCanvasCourseId(url = window.location.href): number | null {
 }
 
 
-export async function handleAddToCalendar(): Promise<Eng10Schedule> {
+export async function handleAddToCalendar(): Promise<DualSchedule> {
   const pdfResponse = await fetch(getCanvasPdfDownloadUrl(getCanvasFileId() ?? ''), {
     credentials: 'include',
   })
@@ -49,7 +49,7 @@ export async function handleAddToCalendar(): Promise<Eng10Schedule> {
   return schedule
 }
 
-export async function addParsedScheduleToCanvas(schedule: Eng10Schedule) {
+export async function addParsedScheduleToCanvas(schedule: DualSchedule) {
   const days = ['odd', 'even'] as const;
 
   return await Promise.all(

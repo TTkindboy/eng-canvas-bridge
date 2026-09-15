@@ -12,6 +12,16 @@ Single-page PDFs with `ODD DAYS` / `EVEN DAYS` section headers. Each entry match
 ```
 Weekdays: `M T W Th F`. Dates are year-less — resolves by finding the closest year where the given month/day falls on the expected weekday.
 
+### 11th grade DOCX schema
+
+Word documents with one two-column table: date and assignment. The first row
+contains an `Odd Days` or `Even Days` heading; remaining rows use dates such as
+`14-Sep`. Dates use the current year unless `Eng11Schedule.from_bytes` receives
+an explicit `year`. The other rotation is returned as an empty list.
+
+The preview endpoints detect DOCX files from their bytes, including uploads
+from the extension without a filename.
+
 ## Environment
 
 ```

@@ -81,9 +81,9 @@ export type CourseFile = {
 };
 
 /**
- * Eng10Schedule
+ * DualSchedule
  */
-export type Eng10Schedule = {
+export type DualSchedule = {
     /**
      * Odd
      */
@@ -186,7 +186,7 @@ export type PreviewScheduleResponses = {
     /**
      * Successful Response
      */
-    200: Eng10Schedule;
+    200: DualSchedule;
 };
 
 export type PreviewScheduleResponse = PreviewScheduleResponses[keyof PreviewScheduleResponses];
@@ -211,13 +211,13 @@ export type PreviewUploadedScheduleResponses = {
     /**
      * Successful Response
      */
-    200: Eng10Schedule;
+    200: DualSchedule;
 };
 
 export type PreviewUploadedScheduleResponse = PreviewUploadedScheduleResponses[keyof PreviewUploadedScheduleResponses];
 
 export type AddScheduleToCanvasData = {
-    body: Eng10Schedule;
+    body: DualSchedule;
     path?: never;
     query: {
         /**

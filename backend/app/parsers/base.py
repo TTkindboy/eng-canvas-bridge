@@ -73,10 +73,10 @@ class TextPdfMixin:
 class BaseSchedule(ABC):
     @classmethod
     @abstractmethod
-    def from_pdf_bytes(cls, pdf_bytes: bytes, course_id: int | None = None) -> Schedule:
+    def from_bytes(cls, data: bytes, course_id: int | None = None) -> Schedule:
         ...
 
-class DualSchedule(BaseModel, BaseSchedule, ABC):
+class DualSchedule(BaseModel):
     model_config = ConfigDict(validate_by_name=True, json_schema_mode_override='validation')
 
     odd_days: Annotated[list[PlannerNote], Field(alias="odd")]
