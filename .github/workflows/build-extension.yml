@@ -8,7 +8,7 @@ on:
 
 jobs:
   extension:
-    name: extension
+    name: Build and upload extension artifact
     runs-on: ubuntu-latest
     environment: production
     defaults:
