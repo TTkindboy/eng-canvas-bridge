@@ -1,9 +1,11 @@
 import assert from 'node:assert/strict';
 import { beforeEach, test } from 'node:test';
-import { addParsedScheduleToCanvas } from '../entrypoints/content/canvasSession.ts';
+import { addParsedScheduleToCanvas, getFileImportStatus } from '../entrypoints/content/canvasSession.ts';
 
 beforeEach(() => {
   globalThis.window = { location: new URL('https://friendsseminary.instructure.com/courses/3565/files/259315') };
+  const saved = new Map();
+  globalThis.localStorage = { getItem: key => saved.get(key) ?? null, setItem: (key, value) => saved.set(key, value) };
   globalThis.document = { cookie: 'other_csrf_token=wrong; _csrf_token=test%2Ftoken%3D' };
 });
 
@@ -54,6 +56,7 @@ test('stops on failure and retries without resubmitting confirmed successes', as
   assert.deepEqual([...completed], [0, 1]);
   assert.deepEqual(titles, ['Odd 1', 'Odd 2', 'Even 1']);
 
+  assert.equal(await getFileImportStatus(), 'idle');
   fail = false;
   await addParsedScheduleToCanvas(schedule, completed);
   assert.deepEqual(titles, ['Odd 1', 'Odd 2', 'Even 1', 'Even 1', 'Even 2']);
@@ -82,4 +85,21 @@ test('requires a CSRF token before creating notes', async (t) => {
   const fetch = t.mock.method(globalThis, 'fetch');
   await assert.rejects(addParsedScheduleToCanvas({ odd: [note('Assignment')], even: [] }, new Set()), /restore your session/);
   assert.equal(fetch.mock.callCount(), 0);
+});
+
+test('remembers a completed file after reload and allows a different file', async (t) => {
+  let creates = 0;
+  t.mock.method(globalThis, 'fetch', async () => {
+    creates++;
+    return new Response(null, { status: 201 });
+  });
+  const schedule = { odd: [note('Assignment')], even: [] };
+  await addParsedScheduleToCanvas(schedule, new Set());
+  assert.equal(await getFileImportStatus(), 'submitted');
+  await addParsedScheduleToCanvas(schedule, new Set());
+  assert.equal(creates, 1);
+  window.location = new URL('https://friendsseminary.instructure.com/courses/3565/files/999');
+  assert.equal(await getFileImportStatus(), 'idle');
+  await addParsedScheduleToCanvas(schedule, new Set());
+  assert.equal(creates, 2);
 });

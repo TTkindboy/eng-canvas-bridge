@@ -1,20 +1,37 @@
 import './style.css';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import calendarAddIcon from '@instructure/ui-icons/svg/Line/calendar-add.svg?raw';
+import { getFileImportStatus } from './canvasSession';
 import type { DualSchedule } from '@/lib/client/types.gen';
 import { addParsedScheduleToCanvas, handleAddToCalendar } from './addToCalendar';
 
 function AddToCalendarButton() {
   const [error, setError] = useState<string | null>(null);
-  const [status, setStatus] = useState<'idle' | 'parsing' | 'submitting' | 'submitted'>('idle');
+  const [status, setStatus] = useState<'checking' | 'idle' | 'parsing' | 'submitting' | 'submitted'>('checking');
+  const working = useRef(false);
   const submission = useRef({
     filePath: '',
     schedule: null as DualSchedule | null,
     completedNotes: new Set<number>(),
   });
 
+  useEffect(() => {
+    let active = true;
+    getFileImportStatus().then(saved => {
+      if (active) setStatus(saved);
+    }).catch(cause => {
+      if (active) {
+        setStatus('idle');
+        setError(cause instanceof Error ? cause.message : 'Could not check this file’s import.');
+      }
+    });
+    return () => { active = false; };
+  }, []);
+
   async function handleClick() {
+    if (working.current || status === 'submitted') return;
+    working.current = true;
     setError(null);
     if (submission.current.filePath !== window.location.pathname) {
       submission.current = {
@@ -44,11 +61,14 @@ function AddToCalendarButton() {
       setError(submitting
         ? `${message} Added ${current.completedNotes.size} of ${total} notes. Retry to add the remaining notes.`
         : cause instanceof Error ? cause.message : 'Failed to parse this Canvas schedule file.');
+    } finally {
+      working.current = false;
     }
   }
 
-  const busy = status === 'parsing' || status === 'submitting';
-  const label = status === 'parsing' ? 'Parsing...'
+  const busy = status === 'checking' || status === 'parsing' || status === 'submitting';
+  const label = status === 'checking' ? 'Checking...'
+    : status === 'parsing' ? 'Parsing...'
     : status === 'submitting' ? 'Adding...'
     : status === 'submitted' ? 'Added to Canvas'
     : error && submission.current.schedule ? 'Retry remaining notes'
@@ -56,7 +76,8 @@ function AddToCalendarButton() {
 
   return (
     <span className="cb-root">
-      <button className="cb-btn" type="button" disabled={busy || status === 'submitted'} onClick={handleClick}>
+      <button className={`cb-btn${status === 'submitted' ? ' cb-btn--submitted' : ''}`} type="button" disabled={busy || status === 'submitted'} onClick={handleClick}
+        aria-pressed={status === 'submitted'}>
         <span className="cb-btn__content">
           <span className="cb-btn__icon" aria-hidden="true" dangerouslySetInnerHTML={{ __html: calendarAddIcon }} />
           {label}
@@ -86,5 +107,9 @@ export default defineContentScript({
       },
     });
     ui.autoMount();
+    ctx.addEventListener(window, 'wxt:locationchange', () => {
+      ui.remove();
+      ui.autoMount();
+    });
   },
 });

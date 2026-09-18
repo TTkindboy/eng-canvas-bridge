@@ -1,8 +1,21 @@
 import type { DualSchedule } from '../../lib/client/types.gen';
 
+function fileKey() {
+  const match = window.location.pathname.match(/\/courses\/(\d+)\/files\/(\d+)/);
+  if (!match) throw new Error('Open the schedule inside its Canvas course.');
+  return `canvas-bridge:added:${match[1]}:${match[2]}`;
+}
+
+export async function getFileImportStatus() {
+  return localStorage.getItem(fileKey()) === '1' ? 'submitted' : 'idle';
+}
+
 export async function addParsedScheduleToCanvas(schedule: DualSchedule, completedNotes: Set<number>) {
   const courseId = window.location.pathname.match(/\/courses\/(\d+)/)?.[1];
   if (!courseId) throw new Error('Open the schedule inside its Canvas course.');
+
+  const key = fileKey();
+  if (localStorage.getItem(key) === '1') return;
 
   const notes = [...schedule.odd, ...schedule.even];
   if (notes.some((note) => !note.todo_date || !note.title.trim())) {
@@ -14,6 +27,7 @@ export async function addParsedScheduleToCanvas(schedule: DualSchedule, complete
     await addPlannerNote(Number(courseId), note.title, note.todo_date!, note.description ?? undefined);
     completedNotes.add(index);
   }
+  localStorage.setItem(key, '1');
 }
 
 async function addPlannerNote(courseId: number, title: string, todoDate: string, details?: string) {
