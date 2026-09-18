@@ -1,10 +1,14 @@
-import { addScheduleToCanvas, previewUploadedSchedule } from '@/lib/client/sdk.gen';
+import { previewUploadedSchedule } from '@/lib/client/sdk.gen';
 import type { DualSchedule } from '@/lib/client/types.gen';
 import { client } from '../../lib/client/client.gen';
 
+export { addParsedScheduleToCanvas } from './canvasSession';
+
+const apiUrl = import.meta.env.WXT_API_URL ?? 'http://localhost:8000';
+
 client.setConfig({
-  baseUrl: import.meta.env.WXT_API_URL ?? 'http://localhost:8000',
-  credentials: 'include',
+  baseUrl: apiUrl,
+  credentials: 'omit',
 });
 
 
@@ -20,11 +24,6 @@ function getCanvasFileId(url = window.location.href): string | null {
   return new URL(url).pathname.match(/\/files\/(\d+)/)?.[1] ?? null
 }
 
-function getCanvasCourseId(url = window.location.href): number | null {
-  return Number(new URL(url).pathname.match(/\/courses\/(\d+)/)?.[1]) ?? null
-}
-
-
 export async function handleAddToCalendar(): Promise<DualSchedule> {
   const pdfResponse = await fetch(getCanvasPdfDownloadUrl(getCanvasFileId() ?? ''), {
     credentials: 'include',
@@ -36,10 +35,17 @@ export async function handleAddToCalendar(): Promise<DualSchedule> {
 
   const pdfBlob = await pdfResponse.blob()
 
-  const { data: schedule } = await previewUploadedSchedule({
+  const { data: schedule, response } = await previewUploadedSchedule({
     body: { pdf: pdfBlob },
-    throwOnError: true,
   })
+
+  if (!response) {
+    throw new Error(`Cannot reach the schedule parser at ${apiUrl}. Check that the backend is running and allows requests from Canvas.`)
+  }
+
+  if (!response.ok) {
+    throw new Error(`The schedule parser returned HTTP ${response.status}.`)
+  }
 
   if (!schedule) {
     throw new Error('Failed to parse schedule')
@@ -47,38 +53,4 @@ export async function handleAddToCalendar(): Promise<DualSchedule> {
 
   console.log('Parsed schedule:', schedule)
   return schedule
-}
-
-export async function addParsedScheduleToCanvas(schedule: DualSchedule) {
-  const days = ['odd', 'even'] as const;
-
-  return await Promise.all(
-    days.map((day) =>
-      addScheduleToCanvas({
-        body: schedule,
-        query: { day, course_id: getCanvasCourseId() },
-        throwOnError: true,
-      }),
-    ),
-  );
-}
-
-async function addPlannerNote(courseId: number | null, title: string, todoDate: string) {
-  const csrfToken = decodeURIComponent(document.cookie.match(/_csrf_token=([^;]+)/)?.[1] ?? "");
-  const response = await fetch(`${getCanvasBaseUrl()}/api/v1/planner_notes`, {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      "X-CSRF-Token": csrfToken,
-      "X-Requested-With": "XMLHttpRequest",
-    },
-    body: JSON.stringify({context_type: "Course", course_id: courseId, todo_date: todoDate, title}),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to add planner note: ${response.status}`);
-  }
-
-  return await response.json();
 }

@@ -87,3 +87,6 @@ jobs:
 
       - name: Build extension
         run: pnpm run build
+
+      - name: Test Canvas session submission
+        run: pnpm test

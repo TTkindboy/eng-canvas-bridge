@@ -1,29 +1,49 @@
 import './style.css';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import calendarAddIcon from '@instructure/ui-icons/svg/Line/calendar-add.svg?raw';
+import type { DualSchedule } from '@/lib/client/types.gen';
 import { addParsedScheduleToCanvas, handleAddToCalendar } from './addToCalendar';
 
 function AddToCalendarButton() {
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<'idle' | 'parsing' | 'submitting' | 'submitted'>('idle');
+  const submission = useRef({
+    filePath: '',
+    schedule: null as DualSchedule | null,
+    completedNotes: new Set<number>(),
+  });
 
   async function handleClick() {
     setError(null);
-    setStatus('parsing');
+    if (submission.current.filePath !== window.location.pathname) {
+      submission.current = {
+        filePath: window.location.pathname,
+        schedule: null,
+        completedNotes: new Set<number>(),
+      };
+    }
+    const current = submission.current;
+    setStatus(current.schedule ? 'submitting' : 'parsing');
 
     let submitting = false;
     try {
-      const schedule = await handleAddToCalendar();
+      current.schedule ??= await handleAddToCalendar();
+      if (current.filePath !== window.location.pathname) {
+        setStatus('idle');
+        return;
+      }
       submitting = true;
       setStatus('submitting');
-      await addParsedScheduleToCanvas(schedule);
+      await addParsedScheduleToCanvas(current.schedule, current.completedNotes);
       setStatus('submitted');
-    } catch {
+    } catch (cause) {
       setStatus('idle');
+      const total = current.schedule ? current.schedule.odd.length + current.schedule.even.length : 0;
+      const message = cause instanceof Error ? cause.message : 'Failed to add schedule days to Canvas.';
       setError(submitting
-        ? 'Failed to add schedule days to Canvas.'
-        : 'Failed to parse this Canvas schedule file.');
+        ? `${message} Added ${current.completedNotes.size} of ${total} notes. Retry to add the remaining notes.`
+        : cause instanceof Error ? cause.message : 'Failed to parse this Canvas schedule file.');
     }
   }
 
@@ -31,6 +51,7 @@ function AddToCalendarButton() {
   const label = status === 'parsing' ? 'Parsing...'
     : status === 'submitting' ? 'Adding...'
     : status === 'submitted' ? 'Added to Canvas'
+    : error && submission.current.schedule ? 'Retry remaining notes'
     : 'Add to Calendar';
 
   return (

@@ -12,6 +12,7 @@
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
     "compile": "tsc --noEmit",
+    "test": "node --test tests/*.test.mjs",
     "openapi-ts": "openapi-ts",
     "postinstall": "wxt prepare"
   },
