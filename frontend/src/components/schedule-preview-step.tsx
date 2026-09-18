@@ -4,7 +4,7 @@ import { ArrowLeft, CalendarPlus, CheckCircle2 } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
 import { Button } from "@/components/ui/button"
 import { fetchSchedulePreview, addScheduleToCanvas, type SelectedFile } from "@/lib/api"
-import type { PlannerNote, Eng10Schedule } from "@/lib/client"
+import type { PlannerNote, DualSchedule } from "@/lib/client"
 import { cn } from "@/lib/utils"
 
 interface SchedulePreviewStepProps {
@@ -154,7 +154,7 @@ export function SchedulePreviewStep({
           selectedFile.file.lastModified,
         ] as const)
 
-  const { data: schedule, error, isLoading } = useSWR<Eng10Schedule>(
+  const { data: schedule, error, isLoading } = useSWR<DualSchedule>(
     previewKey,
     () => fetchSchedulePreview(selectedFile),
   )

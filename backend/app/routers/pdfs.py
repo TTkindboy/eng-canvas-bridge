@@ -6,31 +6,39 @@ from typing import Annotated, Literal
 from fastapi import APIRouter, HTTPException, Query, UploadFile
 
 from ..dependencies import HTTPClient, CanvasAuth, get_settings
-from ..parsers.base import PlannerNote
+from ..parsers.base import DualSchedule, PlannerNote
 from ..parsers.eng10 import Eng10Schedule
+from ..parsers.eng11 import Eng11Schedule
 
 router = APIRouter(prefix="/pdfs")
 
-@router.get("/{file_id}", summary="Preview schedule from PDF", response_model_exclude_none=True)
-async def preview_schedule(client: HTTPClient, auth: CanvasAuth, file_id: int) -> Eng10Schedule:
+
+def parse_schedule(data: bytes) -> DualSchedule:
+    if data.startswith(b"PK"):
+        return Eng11Schedule.from_bytes(data)
+    return Eng10Schedule.from_bytes(data)
+
+
+@router.get("/{file_id}", summary="Preview schedule from PDF or DOCX", response_model_exclude_none=True)
+async def preview_schedule(client: HTTPClient, auth: CanvasAuth, file_id: int) -> DualSchedule:
     pdf_resp = await client.get(
         f"{get_settings().site_url}/files/{file_id}/download", # override baseurl bc no /api/v1
         headers=auth,
         follow_redirects=True,
     )
     pdf_resp.raise_for_status()
-    return Eng10Schedule.from_pdf_bytes(pdf_resp.content)
+    return parse_schedule(pdf_resp.content)
 
-@router.post("/upload", description="Preview schedule from PDF upload")
-async def preview_uploaded_schedule(pdf: UploadFile) -> Eng10Schedule:
-    return Eng10Schedule.from_pdf_bytes(await pdf.read())
+@router.post("/upload", description="Preview schedule from PDF or DOCX upload")
+async def preview_uploaded_schedule(pdf: UploadFile) -> DualSchedule:
+    return parse_schedule(await pdf.read())
 
 
 @router.post("/add", summary="Add Canvas PlannerNotes from parsed schedule")
 async def add_schedule_to_canvas(
     client: HTTPClient,
     auth: CanvasAuth,
-    schedule: Eng10Schedule,
+    schedule: DualSchedule,
     day: Literal["odd", "even"],
     course_id: Annotated[
         int | None,
