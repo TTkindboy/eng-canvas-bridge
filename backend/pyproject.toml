@@ -45,5 +45,5 @@ ignore = ["I001"]
 # [project.scripts]
 # export-openapi = "scripts.export_openapi:main" # disabled because we would need to implement build system
 
-[tool.uv]
-upgrade-package = ["ruff", "ty"]
+# [tool.uv]
+# upgrade-package = ["ruff", "ty"] disabled to stop lockfile constant updating
