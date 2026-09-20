@@ -7,7 +7,7 @@
   "paths": {
     "/pdfs/{file_id}": {
       "get": {
-        "summary": "Preview schedule from PDF",
+        "summary": "Preview schedule from PDF or DOCX",
         "operationId": "preview_schedule",
         "parameters": [
           {
@@ -26,7 +26,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Eng10Schedule"
+                  "$ref": "#/components/schemas/DualSchedule"
                 }
               }
             }
@@ -47,7 +47,7 @@
     "/pdfs/upload": {
       "post": {
         "summary": "Preview Uploaded Schedule",
-        "description": "Preview schedule from PDF upload",
+        "description": "Preview schedule from PDF or DOCX upload",
         "operationId": "preview_uploaded_schedule",
         "requestBody": {
           "content": {
@@ -65,7 +65,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Eng10Schedule"
+                  "$ref": "#/components/schemas/DualSchedule"
                 }
               }
             }
@@ -125,7 +125,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Eng10Schedule"
+                "$ref": "#/components/schemas/DualSchedule"
               }
             }
           }
@@ -421,7 +421,7 @@
         ],
         "title": "CourseFile"
       },
-      "Eng10Schedule": {
+      "DualSchedule": {
         "properties": {
           "odd": {
             "items": {
@@ -443,7 +443,7 @@
           "odd",
           "even"
         ],
-        "title": "Eng10Schedule"
+        "title": "DualSchedule"
       },
       "HTTPValidationError": {
         "properties": {

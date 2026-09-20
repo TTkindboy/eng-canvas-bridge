@@ -1,6 +1,6 @@
 import { client } from '@/lib/client/client.gen'
 import { getCourses, getPdfs, previewSchedule, previewUploadedSchedule } from '@/lib/client'
-import type { Course, CourseFile, Eng10Schedule } from '@/lib/client'
+import type { Course, CourseFile, DualSchedule } from '@/lib/client'
 // TODO: switch most bindings to be direct
 export { addScheduleToCanvas } from '@/lib/client';
 export type { PlannerNote } from '@/lib/client'
@@ -58,7 +58,7 @@ export async function fetchCourseFiles(courseId: string): Promise<FileOption[]> 
     .filter((file) => file.id.length > 0)
 }
 
-export async function fetchSchedulePreview(file: SelectedFile): Promise<Eng10Schedule> {
+export async function fetchSchedulePreview(file: SelectedFile): Promise<DualSchedule> {
   if (file.source === 'canvas') {
     const { data } = await previewSchedule({
       path: { file_id: Number(file.id) },
