@@ -1,8 +1,8 @@
 {
-  "name": "fs-english-extension",
-  "description": "manifest.json description",
+  "name": "fsenglish-calendar",
+  "description": "Turn Friends Seminary English schedule files into Canvas calendar items.",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "wxt",
