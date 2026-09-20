@@ -5,6 +5,7 @@ import { client } from '../../lib/client/client.gen';
 export { addParsedScheduleToCanvas } from './canvasSession';
 
 const apiUrl = import.meta.env.WXT_API_URL ?? 'http://localhost:8000';
+const parserTimeoutMs = 30_000;
 
 client.setConfig({
   baseUrl: apiUrl,
@@ -37,10 +38,11 @@ export async function handleAddToCalendar(): Promise<DualSchedule> {
 
   const { data: schedule, response } = await previewUploadedSchedule({
     body: { pdf: pdfBlob },
+    signal: AbortSignal.timeout(parserTimeoutMs),
   })
 
   if (!response) {
-    throw new Error(`Cannot reach the schedule parser at ${apiUrl}. Check that the backend is running and allows requests from Canvas.`)
+    throw new Error(`The schedule parser at ${apiUrl} did not respond within 30 seconds.`)
   }
 
   if (!response.ok) {
