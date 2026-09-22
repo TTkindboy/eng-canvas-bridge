@@ -4,6 +4,7 @@ import asyncio
 import re
 from typing import Annotated, Literal
 
+import logfire
 from fastapi import APIRouter, HTTPException, Query, UploadFile
 
 from ..dependencies import HTTPClient, CanvasAuth, get_settings
@@ -35,7 +36,9 @@ async def preview_schedule(client: HTTPClient, auth: CanvasAuth, file_id: int) -
 
 @router.post("/upload", description="Preview schedule from PDF or DOCX upload")
 async def preview_uploaded_schedule(pdf: UploadFile) -> DualSchedule:
-    return parse_schedule(await pdf.read())
+    filename = (pdf.filename or "<unknown>").replace("\\", "/").rsplit("/", 1)[-1]
+    with logfire.span("parse uploaded schedule", filename=filename):
+        return parse_schedule(await pdf.read())
 
 
 @router.post("/add", summary="Add Canvas PlannerNotes from parsed schedule")
