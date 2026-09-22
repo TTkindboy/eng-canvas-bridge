@@ -15,9 +15,7 @@ from .routers import courses, pdfs
 # TODO: Implement pagination helper
 
 logfire.configure(
-    # FastAPI Cloud currently cannot resolve the Logfire collector. Avoid
-    # making the production request path depend on that external service.
-    send_to_logfire=False if get_settings().is_prod else "if-token-present",
+    send_to_logfire="if-token-present",
     environment=get_settings().app_env,
     distributed_tracing=False, # to stop FastAPI Cloud traceparent
 )
