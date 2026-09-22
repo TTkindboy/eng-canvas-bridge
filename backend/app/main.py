@@ -15,6 +15,7 @@ from .routers import courses, pdfs
 # TODO: Implement pagination helper
 
 logfire.configure(
+    service_name="eng-canvas-bridge",
     send_to_logfire="if-token-present",
     environment=get_settings().app_env,
     distributed_tracing=False, # to stop FastAPI Cloud traceparent
@@ -39,7 +40,21 @@ app = FastAPI(
     redoc_url=None if _is_prod else "/redoc",
 )
 
-logfire.instrument_fastapi(app)
+def request_attributes_mapper(request, attributes):
+    # Keep useful validated inputs without capturing credentials or schedule contents.
+    return {
+        "values": {
+            key: value for key, value in attributes.get("values", {}).items()
+            if key in {"metadata", "course_id", "file_id", "day", "inactive"}
+        },
+        "errors": [
+            {key: value for key, value in error.items() if key in {"type", "loc", "msg"}}
+            for error in attributes.get("errors", [])
+        ],
+    }
+
+
+logfire.instrument_fastapi(app, request_attributes_mapper=request_attributes_mapper)
 
 app.add_middleware(
     CORSMiddleware,

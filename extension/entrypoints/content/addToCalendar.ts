@@ -1,6 +1,8 @@
+import { getImportMetadata } from './importMetadata';
 import { previewUploadedSchedule } from '@/lib/client/sdk.gen';
 import type { DualSchedule } from '@/lib/client/types.gen';
 import { client } from '../../lib/client/client.gen';
+import { browser } from 'wxt/browser';
 
 export { addParsedScheduleToCanvas } from './canvasSession';
 
@@ -26,6 +28,7 @@ function getCanvasFileId(url = window.location.href): string | null {
 }
 
 export async function handleAddToCalendar(): Promise<DualSchedule> {
+  const metadataPromise = getImportMetadata();
   const pdfResponse = await fetch(getCanvasPdfDownloadUrl(getCanvasFileId() ?? ''), {
     credentials: 'include',
   })
@@ -35,9 +38,14 @@ export async function handleAddToCalendar(): Promise<DualSchedule> {
   }
 
   const pdfBlob = await pdfResponse.blob()
+  const metadata = await metadataPromise;
+  const file = new File([pdfBlob], metadata.filename ?? 'schedule', { type: pdfBlob.type });
 
   const { data: schedule, response } = await previewUploadedSchedule({
-    body: { pdf: pdfBlob },
+    body: {
+      pdf: file,
+      metadata: JSON.stringify({ ...metadata, extension_version: browser.runtime.getManifest().version }),
+    },
     signal: AbortSignal.timeout(parserTimeoutMs),
   })
 
@@ -53,6 +61,5 @@ export async function handleAddToCalendar(): Promise<DualSchedule> {
     throw new Error('Failed to parse schedule')
   }
 
-  console.log('Parsed schedule:', schedule)
   return schedule
 }

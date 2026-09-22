@@ -15,7 +15,7 @@ from .base import BaseSchedule, DualSchedule, PlannerNote, TextPdfMixin
 class Eng11Schedule(DualSchedule, BaseSchedule, TextPdfMixin):
     @classmethod
     @override
-    @logfire.instrument("parse eng11 schedule")
+    @logfire.instrument("parse eng11 schedule", extract_args=False)
     def from_bytes(
         cls,
         data: bytes,
@@ -55,6 +55,7 @@ class Eng11Schedule(DualSchedule, BaseSchedule, TextPdfMixin):
         )
 
     @classmethod
+    @logfire.instrument("parse eng11 PDF schedule", extract_args=False)
     def from_pdf_text(
         cls,
         text: str,

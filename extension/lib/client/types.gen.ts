@@ -22,6 +22,10 @@ export type BodyPreviewUploadedSchedule = {
      * Pdf
      */
     pdf: Blob | File;
+    /**
+     * Metadata
+     */
+    metadata?: string | null;
 };
 
 /**
@@ -102,6 +106,38 @@ export type HttpValidationError = {
      * Detail
      */
     detail?: Array<ValidationError>;
+};
+
+/**
+ * ImportMetadata
+ *
+ * Client-reported diagnostics, never an authentication source.
+ */
+export type ImportMetadata = {
+    /**
+     * User Id
+     */
+    user_id?: string | null;
+    /**
+     * User Name
+     */
+    user_name?: string | null;
+    /**
+     * Course Id
+     */
+    course_id?: string | null;
+    /**
+     * Course Name
+     */
+    course_name?: string | null;
+    /**
+     * File Id
+     */
+    file_id?: string | null;
+    /**
+     * Extension Version
+     */
+    extension_version?: string | null;
 };
 
 export type ParsedDate = string;

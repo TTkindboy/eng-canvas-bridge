@@ -12,7 +12,7 @@ class Eng10Schedule(DualSchedule, BaseSchedule, TextPdfMixin):
         return cls.from_pdf_bytes(data, course_id=course_id)
 
     @classmethod
-    @logfire.instrument("parse eng10 schedule")
+    @logfire.instrument("parse eng10 schedule", extract_args=False)
     def from_pdf_bytes(cls, pdf_bytes: bytes, course_id: int | None = None) -> Eng10Schedule:
         pdf_text = cls.extract_text_from_pdf(pdf_bytes)
         matches = re.findall(

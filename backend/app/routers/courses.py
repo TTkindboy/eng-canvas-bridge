@@ -69,8 +69,12 @@ async def delete_note(client: httpx.AsyncClient, auth: CanvasAuth, note: Planner
         resp = await client.delete(f"/planner_notes/{note.id}", headers=auth)
         resp.raise_for_status()
         return True
-    except httpx.HTTPError as e:
-        logfire.warning("Failed to delete note: {title}", title=note.title, date=note.todo_date, error=str(e))
+    except httpx.HTTPError:
+        logfire.warning(
+            "Failed to delete note: {title}",
+            title=note.title, date=note.todo_date, note_id=note.id,
+            course_id=note.course_id, _exc_info=True,
+        )
         return False
 
 # TODO: Add semaphore
