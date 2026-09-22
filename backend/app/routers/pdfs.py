@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import asyncio
+import re
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, HTTPException, Query, UploadFile
 
 from ..dependencies import HTTPClient, CanvasAuth, get_settings
-from ..parsers.base import DualSchedule, PlannerNote
+from ..parsers.base import DualSchedule, PlannerNote, TextPdfMixin
 from ..parsers.eng10 import Eng10Schedule
 from ..parsers.eng11 import Eng11Schedule
 
@@ -16,6 +17,9 @@ router = APIRouter(prefix="/pdfs")
 def parse_schedule(data: bytes) -> DualSchedule:
     if data.startswith(b"PK"):
         return Eng11Schedule.from_bytes(data)
+    pdf_text = TextPdfMixin.extract_text_from_pdf(data)
+    if re.search(r"\bEng(?:lish)?\.?\s*11\b", pdf_text, re.IGNORECASE):
+        return Eng11Schedule.from_pdf_text(pdf_text)
     return Eng10Schedule.from_bytes(data)
 
 

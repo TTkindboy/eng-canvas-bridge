@@ -38,7 +38,10 @@ export function FileStep({ courseId, courseName, onFileSelect, onBack }: FileSte
   const { getRootProps, getInputProps, isDragActive, isDragGlobal } = useDropzone({
     onDrop,
     noClick: true,
-    accept: { "application/pdf": [".pdf"] }, // add docx later with 11th grade support
+    accept: {
+      "application/pdf": [".pdf"],
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
+    },
   })
 
   const showDropOverlay = isDragGlobal || isDragActive
@@ -107,7 +110,7 @@ export function FileStep({ courseId, courseName, onFileSelect, onBack }: FileSte
           >
             <div className={`flex h-full w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed bg-background/80 ${isDragActive ? "border-primary" : "border-border"}`}> {/* I hate the new background but it looks weird otherwise*/}
               <Upload className={`size-5 ${isDragActive ? "text-primary" : "text-muted-foreground"}`} />
-              <span className={`text-sm font-medium ${isDragActive ? "text-primary" : "text-muted-foreground"}`}>Drop PDF here</span>
+              <span className={`text-sm font-medium ${isDragActive ? "text-primary" : "text-muted-foreground"}`}>Drop PDF or DOCX here</span>
             </div>
           </Magnet>
         )}

@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 import httpx
+import pymupdf
 from docx import Document
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -13,7 +14,7 @@ from inline_snapshot import snapshot
 from app.parsers.base import PlannerNote
 from app.dependencies import get_canvas_creds, get_client
 from app.parsers.eng11 import Eng11Schedule
-from app.routers.pdfs import router
+from app.routers.pdfs import parse_schedule, router
 
 pytestmark = pytest.mark.time_machine(date(2026, 4, 5))
 
@@ -96,6 +97,42 @@ def test_extract_and_parse_full_docx(sample_docx_bytes):
             ],
             even_days=[],
         )
+    )
+
+
+def test_extract_and_parse_eng11_pdf():
+    document = pymupdf.open()
+    page = document.new_page()
+    lines = [
+        "Eng. 11 Syllabus - Even Days - page 1",
+        "14-Sep",
+        "Read the summer reading and bring the book to class.",
+    ]
+    for index, line in enumerate(lines):
+        page.insert_text((72, 72 + index * 24), line)
+    page = document.new_page()
+    lines = [
+        "Eng. 11 Syllabus - Even Days - page 2",
+        "16-Sep",
+        "Prepare two passages and two discussion questions.",
+    ]
+    for index, line in enumerate(lines):
+        page.insert_text((72, 72 + index * 24), line)
+
+    schedule = parse_schedule(document.tobytes())
+
+    assert schedule == Eng11Schedule(
+        odd_days=[],
+        even_days=[
+            PlannerNote(
+                title="Read the summer reading and bring the book to class.",
+                todo_date=date(2026, 9, 14),
+            ),
+            PlannerNote(
+                title="Prepare two passages and two discussion questions.",
+                todo_date=date(2026, 9, 16),
+            ),
+        ],
     )
 
 

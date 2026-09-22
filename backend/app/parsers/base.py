@@ -65,9 +65,8 @@ def nearest_matching_date(month: int, day: int, weekday: str | int | calendar.Da
 class TextPdfMixin:
     @staticmethod
     def extract_text_from_pdf(pdf_bytes: bytes) -> str:
-        doc = pymupdf.Document(stream=pdf_bytes) # maybe use context manager 🤷
-        assert doc.page_count == 1 # TODO: migrate from assert # TODO: Support multi page pdfs
-        return doc.get_page_text(0)
+        with pymupdf.Document(stream=pdf_bytes) as doc:
+            return "\n".join(page.get_text() for page in doc)
 
 
 

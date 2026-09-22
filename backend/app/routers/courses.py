@@ -46,13 +46,13 @@ async def get_courses(client: HTTPClient, auth: CanvasAuth, inactive: bool = Fal
 # Maybe add query parameter to limit to schedules
 @router.get("/{course_id}/pdfs", summary="List course PDFs")
 async def get_pdfs(client: HTTPClient, auth: CanvasAuth, course_id: int) -> list[CourseFile]: # TODO: Strengthen include parameter
-    # assumes filenames include .pdf, which is not always the case. Maybe use mime_class in future
-    params: dict[str, Any] = {"include": ["items"], "per_page": 100, "search_term": ".pdf"}
+    params: dict[str, Any] = {"include": ["items"], "per_page": 100}
     resp = await client.get(f"/courses/{course_id}/modules", headers=auth, params=params)
     resp.raise_for_status()
     return [
         file
         for _, file in sorted(iter_files(resp.json()), key=lambda t: t[0])
+        if file.title.lower().endswith((".pdf", ".docx"))
     ]
 
 def iter_files(modules: list[dict[str, Any]]) -> Iterator[tuple[tuple[int, int], CourseFile]]:
