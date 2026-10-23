@@ -112,7 +112,7 @@ class Eng11Schedule(DualSchedule, BaseSchedule, TextPdfMixin):
         notes = []
         for date_text, assignment in rows:
             assert assignment, "Expected an assignment for each date"
-            todo_date = datetime.strptime(f"{date_text}-{year}", "%d-%b-%Y").date()
+            todo_date = datetime.strptime(f"{date_text}-{year}", "%d-%b-%Y").date()  # noqa: DTZ007
             if previous_date and previous_date.month == 12 and todo_date.month == 1 and year == start_year:
                 year += 1
                 todo_date = todo_date.replace(year=year)
