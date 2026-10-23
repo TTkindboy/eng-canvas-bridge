@@ -143,6 +143,34 @@ def test_explicit_schedule_year(sample_docx_bytes, time_machine):
     assert schedule.odd_days[-1].todo_date == date(2026, 10, 22)
 
 
+def test_second_syllabus():
+    data = (Path(__file__).parent / "data" / "Eng11syllabus2026odds2.docx").read_bytes()
+    schedule = parse_schedule(data)
+    assert schedule.even_days == []
+    assert len(schedule.odd_days) == 25
+    assert schedule.odd_days[0].todo_date == date(2026, 10, 26)
+    assert schedule.odd_days[17].todo_date == date(2026, 12, 17)
+    assert schedule.odd_days[18].todo_date == date(2027, 1, 4)
+    assert schedule.odd_days[-1].todo_date == date(2027, 1, 22)
+    assert [note.title for note in schedule.odd_days] == [
+        " ".join(row.cells[1].text.split())
+        for row in Document(BytesIO(data)).tables[0].rows[2:]
+    ]
+
+
+@pytest.mark.parametrize(
+    "dates",
+    [
+        ("26-Oct", "24-Oct"),
+        ("26-Oct", "26-Oct"),
+        ("17-Dec", "4-Jan", "17-Dec", "4-Jan"),
+    ],
+)
+def test_reject_nonchronological_dates(dates):
+    with pytest.raises(ValueError, match="increasing order"):
+        Eng11Schedule._parse_section([(day, "Read") for day in dates], year=2026)
+
+
 def test_even_day_heading(sample_docx_bytes):
     document = Document(BytesIO(sample_docx_bytes))
     document.tables[0].rows[0].cells[
@@ -168,6 +196,7 @@ def test_invalid_date_is_not_silently_skipped(sample_docx_bytes):
     "filename, odd_count, even_count",
     [
         ("Eng11syllabus2026odds1.docx", 13, 0),
+        ("Eng11syllabus2026odds2.docx", 25, 0),
         ("eng10_sep-oct.pdf", 18, 18),
     ],
 )

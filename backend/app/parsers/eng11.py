@@ -34,12 +34,14 @@ class Eng11Schedule(DualSchedule, BaseSchedule, TextPdfMixin):
             rows.append(tuple(cell.text.strip() for cell in row.cells))
 
         assert rows, "Expected a syllabus heading"
-        rotation = re.search(r"\b(Odd|Even) Days\b", rows[0][1])
+        rotation = re.search(r"\b(odd|even)(?:\s+days|s)\b", rows[0][1], re.IGNORECASE)
         assert rotation is not None, "Expected an Odd Days or Even Days heading"
+        if len(rows) > 1 and tuple(cell.casefold() for cell in rows[1]) == ("date", "work due"):
+            del rows[1]
         notes = cls._parse_section(rows[1:], course_id=course_id, year=year)
         return cls(
-            odd_days=notes if rotation[1] == "Odd" else [],
-            even_days=notes if rotation[1] == "Even" else [],
+            odd_days=notes if rotation[1].lower() == "odd" else [],
+            even_days=notes if rotation[1].lower() == "even" else [],
         )
 
     @classmethod
@@ -105,14 +107,21 @@ class Eng11Schedule(DualSchedule, BaseSchedule, TextPdfMixin):
         if year is None:
             year = date.today().year  # noqa: DTZ011 - calendar year, matching the English 10 parser
         assert rows, "Expected dated assignments"
+        start_year = year
+        previous_date = None
         notes = []
         for date_text, assignment in rows:
             assert assignment, "Expected an assignment for each date"
+            todo_date = datetime.strptime(f"{date_text}-{year}", "%d-%b-%Y").date()
+            if previous_date and previous_date.month == 12 and todo_date.month == 1 and year == start_year:
+                year += 1
+                todo_date = todo_date.replace(year=year)
+            if previous_date and todo_date <= previous_date:
+                raise ValueError(f"Expected dates in increasing order: {date_text}")
+            previous_date = todo_date
             notes.append(
                 PlannerNote(
-                    todo_date=datetime.strptime(  # noqa: DTZ007 - only the calendar date is used
-                        f"{date_text}-{year}", "%d-%b-%Y"
-                    ).date(),
+                    todo_date=todo_date,
                     title=" ".join(assignment.split()),
                     course_id=course_id,
                 )
