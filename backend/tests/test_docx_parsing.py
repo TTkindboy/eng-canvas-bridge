@@ -100,11 +100,12 @@ def test_extract_and_parse_full_docx(sample_docx_bytes):
     )
 
 
-def test_extract_and_parse_eng11_pdf():
+@pytest.mark.parametrize("heading", ["Even Days", "Evens", "evens"])
+def test_extract_and_parse_eng11_pdf(heading):
     document = pymupdf.open()
     page = document.new_page()
     lines = [
-        "Eng. 11 Syllabus - Even Days - page 1",
+        f"Eng. 11 Syllabus - {heading} - page 1",
         "14-Sep",
         "Read the summer reading and bring the book to class.",
     ]
@@ -112,7 +113,7 @@ def test_extract_and_parse_eng11_pdf():
         page.insert_text((72, 72 + index * 24), line)
     page = document.new_page()
     lines = [
-        "Eng. 11 Syllabus - Even Days - page 2",
+        f"Eng. 11 Syllabus - {heading} - page 2",
         "16-Sep",
         "Prepare two passages and two discussion questions.",
     ]

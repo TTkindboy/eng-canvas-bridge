@@ -12,6 +12,10 @@ from docx import Document
 from .base import BaseSchedule, DualSchedule, PlannerNote, TextPdfMixin
 
 
+_ROTATION_PATTERN = r"\b(odd|even)(?:\s+days|s)\b"
+_COURSE_PATTERN = r"\bEng(?:lish)?\.?\s*11\b"
+
+
 class Eng11Schedule(DualSchedule, BaseSchedule, TextPdfMixin):
     @classmethod
     @override
@@ -34,8 +38,8 @@ class Eng11Schedule(DualSchedule, BaseSchedule, TextPdfMixin):
             rows.append(tuple(cell.text.strip() for cell in row.cells))
 
         assert rows, "Expected a syllabus heading"
-        rotation = re.search(r"\b(odd|even)(?:\s+days|s)\b", rows[0][1], re.IGNORECASE)
-        assert rotation is not None, "Expected an Odd Days or Even Days heading"
+        rotation = re.search(_ROTATION_PATTERN, rows[0][1], re.IGNORECASE)
+        assert rotation is not None, "Expected an Odd Days, Even Days, Odds, or Evens heading"
         if len(rows) > 1 and tuple(cell.casefold() for cell in rows[1]) == ("date", "work due"):
             del rows[1]
         notes = cls._parse_section(rows[1:], course_id=course_id, year=year)
@@ -66,19 +70,18 @@ class Eng11Schedule(DualSchedule, BaseSchedule, TextPdfMixin):
         year: int | None = None,
     ) -> Eng11Schedule:
         heading = re.search(
-            r"\bEng(?:lish)?\.?\s*11\b.{0,200}?\b(Odd|Even)\s+Days\b",
+            rf"{_COURSE_PATTERN}.{{0,200}}?{_ROTATION_PATTERN}",
             text,
             re.IGNORECASE | re.DOTALL,
         )
-        assert heading is not None, "Expected an English 11 Odd Days or Even Days heading"
+        assert heading is not None, "Expected an English 11 Odd Days, Even Days, Odds, or Evens heading"
 
         rows = [
             (
                 match.group("date"),
                 " ".join(
                     re.sub(
-                        r"(?im)^.*\bEng(?:lish)?\.?\s*11\b.*"
-                        r"\b(?:Odd|Even)\s+Days\b.*$",
+                        rf"(?im)^.*{_COURSE_PATTERN}.*{_ROTATION_PATTERN}.*$",
                         "",
                         match.group("assignment"),
                     ).split()
